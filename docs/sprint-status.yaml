@@ -1,0 +1,74 @@
+# generated: 2025-11-04
+# project: zeroai
+# project_key: zeroai
+# tracking_system: file-system
+# story_location: {project-root}/docs/stories
+
+# STATUS DEFINITIONS:
+# ==================
+# Epic Status:
+#   - backlog: Epic exists in epic file but not contexted
+#   - contexted: Epic tech context created (required before drafting stories)
+#
+# Story Status:
+#   - backlog: Story only exists in epic file
+#   - drafted: Story file created in stories folder
+#   - ready-for-dev: Draft approved and story context created
+#   - in-progress: Developer actively working on implementation
+#   - review: Under SM review (via code-review workflow)
+#   - done: Story completed
+#
+# Retrospective Status:
+#   - optional: Can be completed but not required
+#   - completed: Retrospective has been done
+#
+# WORKFLOW NOTES:
+# ===============
+# - Epics should be 'contexted' before stories can be 'drafted'
+# - Stories can be worked in parallel if team capacity allows
+# - SM typically drafts next story after previous one is 'done' to incorporate learnings
+# - Dev moves story to 'review', SM reviews, then Dev moves to 'done'
+
+generated: "2025-11-04"
+project: "zeroai"
+project_key: "zeroai"
+tracking_system: "file-system"
+story_location: "{project-root}/docs/stories"
+
+development_status:
+  # Epic 1: Core Chat Infrastructure
+  epic-1: backlog
+  1-1-basic-web-app-setup-with-chat-ui-skeleton: review
+  1-2-conversation-state-management: backlog
+  1-3-llm-api-integration: backlog
+  1-4-socratic-system-prompt-engineering: backlog
+  epic-1-retrospective: optional
+
+  # Epic 2: Scaffolded Socratic Dialogue
+  epic-2: backlog
+  2-1-context-mode-selection-ui: backlog
+  2-2-mode-aware-system-prompts: backlog
+  2-3-worked-example-scaffolding-logic: backlog
+  2-4-i-m-really-confused-button: backlog
+  epic-2-retrospective: optional
+
+  # Epic 3: Problem Input & Math Rendering
+  epic-3: backlog
+  3-1-text-problem-entry: backlog
+  3-2-image-upload-with-ocr: backlog
+  3-3-katex-math-rendering: backlog
+  epic-3-retrospective: optional
+
+  # Epic 4: Gamification & Polish
+  epic-4: backlog
+  4-1-daily-streak-tracker: backlog
+  4-2-problems-solved-counter: backlog
+  4-3-celebration-animations: backlog
+  4-4-responsive-design-ux-polish: backlog
+  epic-4-retrospective: optional
+
+  # Epic 5: Testing, Documentation & Deployment
+  epic-5: backlog
+  5-1-cross-problem-type-testing-validation: backlog
+  5-2-documentation-demo-video-deployment: backlog
+  epic-5-retrospective: optional
