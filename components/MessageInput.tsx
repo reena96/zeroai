@@ -7,24 +7,90 @@ export default function MessageInput() {
   const [input, setInput] = useState('');
   const { addMessage, isLoading, setLoading } = useChatStore();
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!input.trim() || isLoading) return;
 
+    const userMessage = input.trim();
+
     // Add user message
-    addMessage('user', input.trim());
+    addMessage('user', userMessage);
 
     // Clear input
     setInput('');
 
-    // Simulate AI thinking (will be replaced with actual LLM in Story 1.3)
+    // Call OpenAI API
     setLoading(true);
-    setTimeout(() => {
+
+    try {
+      // Get conversation history from store
+      const messages = useChatStore.getState().messages;
+
+      // Send request to API route
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          messages: messages.map((m) => ({
+            role: m.role,
+            content: m.content,
+          })),
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+
+      // Handle streaming response
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+
+      if (!reader) {
+        throw new Error('No response body');
+      }
+
+      // Create a new message for the AI response
+      let aiResponse = '';
+      const { addMessage: addMsg } = useChatStore.getState();
+
+      // Add initial empty message
+      addMsg('assistant', '');
+      const currentMessages = useChatStore.getState().messages;
+      const aiMessageIndex = currentMessages.length - 1;
+
+      // Read streaming chunks
+      while (true) {
+        const { done, value } = await reader.read();
+
+        if (done) break;
+
+        // Decode chunk and append to response
+        const chunk = decoder.decode(value, { stream: true });
+        aiResponse += chunk;
+
+        // Update the last message in the store with accumulated response
+        const messages = useChatStore.getState().messages;
+        const updatedMessages = [...messages];
+        updatedMessages[aiMessageIndex] = {
+          ...updatedMessages[aiMessageIndex],
+          content: aiResponse,
+        };
+        useChatStore.setState({ messages: updatedMessages });
+      }
+
+      setLoading(false);
+    } catch (error) {
+      console.error('Error calling API:', error);
+      setLoading(false);
+
+      // Add error message
       addMessage(
         'assistant',
-        "I'm here to help you learn! (Note: Real AI responses will be added in Story 1.3)"
+        "Sorry, I encountered an error. Please check your API key configuration and try again. You can retry by sending your message again."
       );
-      setLoading(false);
-    }, 1500);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -73,7 +139,7 @@ export default function MessageInput() {
                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                 ></path>
               </svg>
-              Sending
+              Thinking...
             </span>
           ) : (
             'Send'

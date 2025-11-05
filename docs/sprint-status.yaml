@@ -40,7 +40,7 @@ development_status:
   epic-1: backlog
   1-1-basic-web-app-setup-with-chat-ui-skeleton: done
   1-2-conversation-state-management: done
-  1-3-llm-api-integration: backlog
+  1-3-llm-api-integration: done
   1-4-socratic-system-prompt-engineering: backlog
   epic-1-retrospective: optional
 

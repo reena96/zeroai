@@ -33,7 +33,7 @@ export default function MessageList() {
               Start a conversation by typing a message below.
             </p>
             <p className="text-xs mt-2 text-gray-400">
-              I'll guide you through problems using Socratic questioning.
+              I&apos;ll guide you through problems using Socratic questioning.
             </p>
           </div>
         </div>
