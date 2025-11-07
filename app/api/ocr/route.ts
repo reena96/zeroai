@@ -27,9 +27,10 @@ export async function POST(req: NextRequest) {
 
     console.log('[OCR] Processing image with GPT-4 Vision...');
 
-    // Call GPT-4 Vision API to extract math problem
+    // Call GPT-4o Vision API to extract math problem
+    // gpt-4o has native vision capabilities and replaced gpt-4-vision-preview
     const response = await openai.chat.completions.create({
-      model: 'gpt-4-vision-preview',
+      model: 'gpt-4o',
       messages: [
         {
           role: 'user',
