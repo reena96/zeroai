@@ -212,7 +212,7 @@ AI: "x = 4" ❌ TOO DIRECT - no learning
 
 - [Architecture Document - Socratic Prompting](../../docs/architecture.md#novel-pattern-context-aware-socratic-prompting)
 - [Architecture Document - Prompts Module Pattern](../../docs/architecture.md#implementation-patterns)
-- [Epics Document - Story 1.4](../../docs/epics.md#story-14-socratic-system-prompt-engineering)
+- [Epics Document - Story 1.4](../../docs/epics/epic-1-core-chat-infrastructure.md#story-14-socratic-system-prompt-engineering)
 - [Previous Story - 1.3](./1-3-llm-api-integration.md)
 
 ## Dev Agent Record

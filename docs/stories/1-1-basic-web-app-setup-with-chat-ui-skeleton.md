@@ -193,7 +193,7 @@ Since the working directory `/Users/reena/gauntletai/zeroai` already contained B
 
 ## Change Log
 
-- 2025-11-04: Story created from Epic 1, Story 1.1 [epics.md]
+- 2025-11-04: Story created from Epic 1, Story 1.1 [epic-1-core-chat-infrastructure.md]
 - 2025-11-04: Story implementation completed - Next.js 15 foundation established with all ACs satisfied
 - 2025-11-04: Senior Developer Review completed - APPROVED
 

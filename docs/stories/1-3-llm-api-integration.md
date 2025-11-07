@@ -189,7 +189,7 @@ zeroai/
 ### References
 
 - [Architecture Document - API Integration](../../docs/architecture.md#llm-integration)
-- [Epics Document - Story 1.3](../../docs/epics.md#story-13-llm-api-integration)
+- [Epics Document - Story 1.3](../../docs/epics/epic-1-core-chat-infrastructure.md#story-13-llm-api-integration)
 - [OpenAI SDK Documentation](https://github.com/openai/openai-node)
 - [Next.js API Routes](https://nextjs.org/docs/app/building-your-application/routing/route-handlers)
 - [Previous Story - 1.2](./1-2-conversation-state-management.md)
@@ -276,7 +276,7 @@ The application is now ready for end-to-end testing with real user interactions.
 
 ## Change Log
 
-- 2025-11-04: Story created from Epic 1, Story 1.3 [epics.md]
+- 2025-11-04: Story created from Epic 1, Story 1.3 [epic-1-core-chat-infrastructure.md]
 - 2025-11-04: Implementation completed - OpenAI GPT-4 integration with streaming responses [DEV Agent]
 - 2025-11-04: Senior Developer Review completed - APPROVED [Code Review]
 - 2025-11-04: Enhanced with math validation layer (mathjs + Wolfram Alpha hybrid approach) [DEV Agent]

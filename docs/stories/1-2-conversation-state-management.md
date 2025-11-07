@@ -175,7 +175,7 @@ zeroai/
 - [Architecture Document - State Management](../../docs/architecture.md#state-management)
 - [Architecture Document - Component Structure](../../docs/architecture.md#component-structure)
 - [Architecture Document - Message Format](../../docs/architecture.md#message-interface)
-- [Epics Document - Story 1.2](../../docs/epics.md#story-12-conversation-state-management)
+- [Epic 1 - Story 1.2](../../docs/epics/epic-1-core-chat-infrastructure.md#story-12-conversation-state-management)
 - [Previous Story - 1.1](./1-1-basic-web-app-setup-with-chat-ui-skeleton.md)
 
 ## Dev Agent Record
@@ -264,7 +264,7 @@ Built complete conversation state management system using Zustand for global sta
 
 ## Change Log
 
-- 2025-11-04: Story created from Epic 1, Story 1.2 [epics.md]
+- 2025-11-04: Story created from Epic 1, Story 1.2 [epic-1-core-chat-infrastructure.md]
 - 2025-11-04: Story implementation completed - Conversation state management with Zustand and chat UI components fully functional
 - 2025-11-04: Senior Developer Review completed - APPROVED
 
