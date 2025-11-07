@@ -53,7 +53,7 @@ development_status:
   epic-2-retrospective: optional
 
   # Epic 3: Problem Input & Math Rendering
-  epic-3: backlog
+  epic-3: done
   3-1-text-problem-entry: review
   3-2-image-upload-with-ocr: review
   3-3-katex-math-rendering: review
