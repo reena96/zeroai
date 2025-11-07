@@ -3,6 +3,7 @@
 import { Message as MessageType } from '@/store/chat';
 import { useChatStore } from '@/store/chat';
 import ConfusedButton from './ConfusedButton';
+import { MathText } from './MathText';
 
 interface MessageProps {
   message: MessageType;
@@ -37,9 +38,9 @@ export default function Message({ message }: MessageProps) {
           {isUser ? 'You' : 'AI Tutor'}
         </div>
 
-        {/* Message content */}
+        {/* Message content - render math for AI messages, plain text for user */}
         <div className="text-sm whitespace-pre-wrap break-words">
-          {message.content}
+          {isUser ? message.content : <MathText text={message.content} />}
         </div>
 
         {/* Timestamp */}

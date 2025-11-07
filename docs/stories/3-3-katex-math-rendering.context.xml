@@ -1,0 +1,156 @@
+<story-context id="bmad/bmm/workflows/4-implementation/story-context/template" v="1.0">
+  <metadata>
+    <epicId>3</epicId>
+    <storyId>3</storyId>
+    <title>KaTeX Math Rendering</title>
+    <status>drafted</status>
+    <generatedAt>2025-11-07</generatedAt>
+    <generator>BMAD Story Context Workflow</generator>
+    <sourceStoryPath>docs/stories/3-3-katex-math-rendering.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>student</asA>
+    <iWant>see math formatted beautifully in the chat</iWant>
+    <soThat>equations are easy to read and understand</soThat>
+    <tasks>
+      - Task 1: Install and configure KaTeX library (AC: #3)
+      - Task 2: Create MathRenderer utility component (AC: #1, #2, #5)
+      - Task 3: Integrate MathRenderer into Message component (AC: #4)
+      - Task 4: Implement error handling and fallback (AC: #6)
+      - Task 5: Ensure mobile responsiveness (AC: #7)
+      - Task 6: Test common mathematical notation (AC: #8)
+    </tasks>
+  </story>
+
+  <acceptanceCriteria>
+    1. Inline math (e.g., $x^2$) renders as formatted math in assistant messages
+    2. Display math (e.g., $$x = \frac{-b \pm \sqrt{b^2-4ac}}{2a}$$) renders centered on its own line
+    3. KaTeX library used for rendering (fast, no MathJax)
+    4. Works with both typed and OCR-extracted problems
+    5. Rendering happens client-side for performance
+    6. Fallback to plain text if KaTeX rendering fails
+    7. Mobile-responsive (equations scale appropriately)
+    8. Common notation supported: fractions, exponents, square roots, Greek letters, subscripts
+  </acceptanceCriteria>
+
+  <artifacts>
+    <docs>
+      <doc>
+        <path>docs/PRD.md</path>
+        <title>Product Requirements Document</title>
+        <section>FR-1.3 KaTeX Math Rendering</section>
+        <snippet>AI responses use LaTeX notation for equations. Client-side rendering with KaTeX. Inline math $...$ and display math $$...$$. Fallback to plain text if rendering fails. Mobile-responsive. Coverage: fractions, exponents, roots, Greek letters, subscripts.</snippet>
+      </doc>
+      <doc>
+        <path>docs/architecture.md</path>
+        <title>Architecture Document</title>
+        <section>ADR-005: KaTeX over MathJax</section>
+        <snippet>Use KaTeX for math rendering (not MathJax). Faster (no runtime compilation). Smaller bundle (~100KB vs 300KB+). Client-side rendering. Good coverage for K-12 math. Trade-off: slightly less notation coverage vs speed/size.</snippet>
+      </doc>
+      <doc>
+        <path>docs/epics/epic-3-problem-input-math-rendering.md</path>
+        <title>Epic 3: Problem Input & Math Rendering</title>
+        <section>Story 3.3: KaTeX Math Rendering</section>
+        <snippet>Technical Notes: Install katex package. Import katex/dist/katex.min.css. Parse text for $...$ (inline) and $$...$$ (display). Use katex.renderToString(). Client-side component. Error handling: try-catch with fallback to plain text.</snippet>
+      </doc>
+    </docs>
+    <code>
+      <artifact>
+        <path>components/Message.tsx</path>
+        <kind>component</kind>
+        <symbol>Message</symbol>
+        <lines>1-50</lines>
+        <reason>Will be modified to use MathText component for rendering assistant messages with LaTeX. Currently displays plain text - needs to parse and render math notation.</reason>
+      </artifact>
+      <artifact>
+        <path>app/layout.tsx</path>
+        <kind>layout</kind>
+        <symbol>RootLayout</symbol>
+        <lines>1-30</lines>
+        <reason>Need to import KaTeX CSS stylesheet here for global availability.</reason>
+      </artifact>
+    </code>
+    <dependencies>
+      <node>
+        <katex>^0.16.0</katex>
+        <react>^18.3.0</react>
+        <next>^15.0.0</next>
+      </node>
+      <devDependencies>
+        <types-katex>^0.16.0</types-katex>
+      </devDependencies>
+    </dependencies>
+  </artifacts>
+
+  <constraints>
+    - **KaTeX Required**: Per ADR-005, use KaTeX library (not MathJax). Faster rendering, smaller bundle size (~100KB).
+    - **Client-Side Rendering**: Use katex.renderToString() in React component, not server-side. Performance optimization.
+    - **Delimiter Parsing**: Parse $...$ for inline math, $$...$$ for display (block-level, centered) math.
+    - **Error Handling**: Wrap katex.renderToString() in try-catch. On error, display original LaTeX text (graceful degradation).
+    - **Assistant Messages Only**: Apply math rendering to AI responses only. Keep user messages as plain text.
+    - **CSS Import**: Import 'katex/dist/katex.min.css' in app/layout.tsx or global styles.
+    - **Mobile Responsive**: Equations must scale on small screens. Add overflow handling if needed.
+    - **Component Pattern**: Create reusable MathText component following 'use client' pattern.
+  </constraints>
+
+  <interfaces>
+    <interface>
+      <name>katex.renderToString</name>
+      <kind>library function</kind>
+      <signature>katex.renderToString(latex: string, options?: { displayMode?: boolean }) => string</signature>
+      <path>External (katex package)</path>
+      <description>Renders LaTeX string to HTML. displayMode: false for inline ($...$), true for display ($$...$$). Returns HTML string to insert via dangerouslySetInnerHTML.</description>
+    </interface>
+    <interface>
+      <name>MathText component</name>
+      <kind>React component</kind>
+      <signature>&lt;MathText text={string} /&gt; => ReactNode</signature>
+      <path>components/MathText.tsx</path>
+      <description>Parses text for LaTeX delimiters, renders with KaTeX. Returns array of text and rendered math segments. Used by Message component for assistant messages.</description>
+    </interface>
+  </interfaces>
+
+  <tests>
+    <standards>
+      Manual testing with documented test matrix per ADR-004. No automated tests for MVP. Test with various LaTeX expressions. Verify mobile responsiveness.
+    </standards>
+    <locations>
+      No test directories defined for MVP. Manual testing documented in docs/test-results.md (Story 5.1).
+    </locations>
+    <ideas>
+      **AC #1 Test Ideas (Inline Math):**
+      - Test: "The solution is $x = 4$."
+      - Test: "We have $2x + 5 = 13$, so $x = 4$."
+      - Test mixed: "When $a = 1$, $b = 2$, and $c = 3$..."
+
+      **AC #2 Test Ideas (Display Math):**
+      - Test quadratic: "$$x = \frac{-b \pm \sqrt{b^2-4ac}}{2a}$$"
+      - Test integral: "$$\int_0^1 x^2 dx = \frac{1}{3}$$"
+      - Test summation: "$$\sum_{i=1}^{n} i = \frac{n(n+1)}{2}$$"
+
+      **AC #4 Test Ideas (Integration):**
+      - Type problem from Story 3.1 → verify AI response renders LaTeX
+      - Upload image from Story 3.2 → verify AI response renders LaTeX
+      - Test both inline and display in same response
+
+      **AC #6 Test Ideas (Error Handling):**
+      - Invalid LaTeX: "$x = \invalid$" → shows plain text
+      - Malformed delimiters: "$$x = 4$" → graceful handling
+      - Unclosed delimiter: "$x = 4" → fallback to plain text
+
+      **AC #7 Test Ideas (Mobile):**
+      - Test long equation on iPhone-sized screen
+      - Test centered display math on mobile
+      - Verify overflow handling (horizontal scroll if needed)
+
+      **AC #8 Test Ideas (Notation Coverage):**
+      - Fractions: $\frac{3}{4}$, $\frac{a+b}{c-d}$
+      - Exponents: $x^2$, $e^{i\pi}$, $2^{10}$
+      - Roots: $\sqrt{2}$, $\sqrt[3]{8}$, $\sqrt{x^2+1}$
+      - Greek: $\alpha$, $\beta$, $\pi$, $\theta$, $\Delta$
+      - Subscripts: $x_1$, $a_n$, $v_{max}$
+      - Complex: $\int_a^b f(x)dx$, $\lim_{x \to 0}$
+    </ideas>
+  </tests>
+</story-context>
