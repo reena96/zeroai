@@ -45,11 +45,11 @@ development_status:
   epic-1-retrospective: optional
 
   # Epic 2: Scaffolded Socratic Dialogue
-  epic-2: backlog
-  2-1-context-mode-selection-ui: backlog
-  2-2-mode-aware-system-prompts: backlog
-  2-3-worked-example-scaffolding-logic: backlog
-  2-4-i-m-really-confused-button: backlog
+  epic-2: done
+  2-1-context-mode-selection-ui: done
+  2-2-mode-aware-system-prompts: done
+  2-3-worked-example-scaffolding-logic: done
+  2-4-i-m-really-confused-button: done
   epic-2-retrospective: optional
 
   # Epic 3: Problem Input & Math Rendering

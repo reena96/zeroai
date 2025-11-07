@@ -5,7 +5,7 @@ import { useChatStore } from '@/store/chat';
 
 export default function MessageInput() {
   const [input, setInput] = useState('');
-  const { addMessage, isLoading, setLoading } = useChatStore();
+  const { addMessage, isLoading, setLoading, sessionMode, setStruggleState } = useChatStore();
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
@@ -25,7 +25,7 @@ export default function MessageInput() {
       // Get conversation history from store
       const messages = useChatStore.getState().messages;
 
-      // Send request to API route
+      // Send request to API route with sessionMode
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
@@ -36,12 +36,17 @@ export default function MessageInput() {
             role: m.role,
             content: m.content,
           })),
+          sessionMode: sessionMode, // Pass mode for adaptive prompting
         }),
       });
 
       if (!response.ok) {
         throw new Error(`API error: ${response.status}`);
       }
+
+      // Read struggle state from response header
+      const struggleState = response.headers.get('X-Struggle-State');
+      const isStruggling = struggleState === 'true';
 
       // Handle streaming response
       const reader = response.body?.getReader();
@@ -79,6 +84,9 @@ export default function MessageInput() {
         };
         useChatStore.setState({ messages: updatedMessages });
       }
+
+      // Update struggle state in store after response is complete
+      setStruggleState(isStruggling);
 
       setLoading(false);
     } catch (error) {

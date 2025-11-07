@@ -1,0 +1,187 @@
+<story-context id="bmad/bmm/workflows/4-implementation/story-context/template" v="1.0">
+  <metadata>
+    <epicId>2</epicId>
+    <storyId>1</storyId>
+    <title>Context Mode Selection UI</title>
+    <status>drafted</status>
+    <generatedAt>2025-11-07</generatedAt>
+    <generator>BMAD Story Context Workflow</generator>
+    <sourceStoryPath>docs/stories/2-1-context-mode-selection-ui.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>a student</asA>
+    <iWant>to choose my learning context (Homework Help, Exam Prep, or Exploration) before starting</iWant>
+    <soThat>the AI adapts its pacing to my situation</soThat>
+    <tasks>
+- Create `ModeSelector` component (AC: #1, #2, #3)
+  - Create `/components/ModeSelector.tsx` with three button options
+  - Add icons using Heroicons or Lucide
+  - Implement descriptions for each mode
+  - Add onClick handler to set mode in state
+  - Style with Tailwind (large buttons, min 120px height)
+  - Add one-click selection with immediate transition
+
+- Implement session state management (AC: #3, #4, #5)
+  - Add `sessionMode: 'homework' | 'exam' | 'explore' | null` to state
+  - Create `setSessionMode` function
+  - Show mode selector when `sessionMode === null`
+  - Hide mode selector after selection
+  - Prevent mode changes mid-session (no reset button during conversation)
+
+- Add mode indicator to header (AC: #4)
+  - Create `<ModeIndicator mode={sessionMode} />` component
+  - Display small badge/pill in header showing current mode
+  - Use mode-specific colors (homework: blue, exam: orange, explore: green)
+  - Add tooltip explaining current mode
+
+- Implement default mode logic (AC: #6)
+  - If user doesn't select mode within 10 seconds, auto-select "Homework Help"
+  - Show brief message: "Defaulting to Homework Help mode"
+  - Allow instant override if user clicks different mode before chat starts
+
+- Design and UX polish (AC: #7)
+  - Ensure buttons are touch-friendly (min 44px tap targets)
+  - Add hover states and transitions
+  - Test selection flow takes <5 seconds
+  - Ensure responsive on tablet and desktop
+  - Clear visual hierarchy (mode selection is primary action)
+
+- Testing and validation (AC: all)
+  - Test all three mode selections
+  - Verify mode indicator appears in header
+  - Verify mode cannot be changed mid-session
+  - Test default to Homework Help after 10 seconds
+  - Test responsive design on multiple screen sizes
+  - Run `npm run build` and verify no errors
+    </tasks>
+  </story>
+
+  <acceptanceCriteria>
+1. Mode selection screen shown at start of new session
+2. Three clear buttons with icons and descriptions:
+   - 🏃 Homework Help: "Due soon? Get efficient help that still teaches"
+   - 📚 Exam Prep: "Test coming up? Fast-paced review"
+   - 🔍 Exploration: "Learning for fun? Deep patient guidance"
+3. One-click selection stores mode in session state
+4. Selected mode visible throughout session (small indicator in header)
+5. Mode cannot be changed mid-session (prevents confusion)
+6. Default to Homework Help if user skips selection
+7. Clean, intuitive design - takes <5 seconds to choose
+  </acceptanceCriteria>
+
+  <artifacts>
+    <docs>
+      <doc path="docs/PRD.md" section="Magic Moments">
+        Context-Aware Adaptation is the first magic moment: students select mode (Homework/Exam/Exploration) and AI adapts pacing accordingly.
+      </doc>
+      <doc path="docs/PRD.md" section="Success Criteria - UX">
+        Clear context mode selection with 3 visual buttons is a key UX requirement for Gauntlet competition.
+      </doc>
+      <doc path="docs/architecture.md" section="Project Structure">
+        ModeSelector component should be created at components/ModeSelector.tsx following the established architecture pattern.
+      </doc>
+      <doc path="docs/epics.md" section="Epic 2">
+        Mode selection is the foundation for scaffolded Socratic dialogue - other stories depend on this state.
+      </doc>
+      <doc path="docs/stories/1-2-conversation-state-management.md">
+        Zustand store pattern established in Story 1.2 - use same approach for sessionMode state.
+      </doc>
+    </docs>
+    <code>
+      <artifact path="store/chat.ts" kind="store" symbol="useChatStore" reason="Existing Zustand store - extend with sessionMode">
+        Current chat store manages messages and loading state. Story 2.1 should extend this store to include sessionMode state management.
+      </artifact>
+      <artifact path="components/ChatContainer.tsx" kind="component" symbol="ChatContainer" reason="Main container - add mode selection before chat">
+        Top-level component where ModeSelector should be conditionally rendered based on sessionMode state.
+      </artifact>
+      <artifact path="components/MessageList.tsx" kind="component" symbol="MessageList" reason="Shows how components consume Zustand store">
+        Example of consuming useChatStore - ModeSelector and ModeIndicator will follow same pattern.
+      </artifact>
+      <artifact path="app/page.tsx" kind="page" symbol="Home" reason="Root page rendering ChatContainer">
+        Entry point - no changes needed here, all logic in ChatContainer.
+      </artifact>
+    </code>
+    <dependencies>
+      <node>
+        <dep name="zustand" version="^5.0.8">State management library - already installed</dep>
+        <dep name="nanoid" version="^5.1.6">ID generation - already installed</dep>
+        <dep name="next" version="^15.0.0">Framework with App Router</dep>
+        <dep name="react" version="^18.3.0">UI library</dep>
+        <dep name="tailwindcss" version="^3.4.1">Styling utility - already configured</dep>
+        <dep name="lucide-react" version="latest" status="to-install">Icon library for mode selection UI</dep>
+      </node>
+    </dependencies>
+  </artifacts>
+
+  <constraints>
+    - Use Zustand store pattern from Story 1.2 - extend existing store/chat.ts
+    - Follow Next.js 15 App Router conventions ('use client' for interactive components)
+    - Use Tailwind CSS for all styling (no custom CSS files)
+    - Icons: Install lucide-react for consistent icon components (or use emojis as fallback)
+    - State type: sessionMode: 'homework' | 'exam' | 'explore' | null
+    - Mode locked after selection (no UI to change mid-session)
+    - Default to 'homework' after 10 seconds if no selection
+    - Large buttons: min 120px height, min 44px tap targets for mobile
+    - Mode indicator: Small badge in header, non-intrusive
+    - No localStorage for mode (fresh session = new selection)
+  </constraints>
+
+  <interfaces>
+    <interface name="SessionMode Type" kind="type">
+      <signature>type SessionMode = 'homework' | 'exam' | 'explore' | null;</signature>
+      <path>store/chat.ts</path>
+    </interface>
+    <interface name="useChatStore" kind="zustand-store">
+      <signature>
+        interface ChatState {
+          messages: Message[];
+          isLoading: boolean;
+          sessionMode: SessionMode; // NEW
+          setSessionMode: (mode: SessionMode) => void; // NEW
+          addMessage: (role: 'user' | 'assistant', content: string) => void;
+          clearMessages: () => void;
+          setLoading: (loading: boolean) => void;
+        }
+      </signature>
+      <path>store/chat.ts</path>
+    </interface>
+    <interface name="ModeSelector Props" kind="component-props">
+      <signature>
+        interface ModeSelectorProps {
+          onSelectMode: (mode: 'homework' | 'exam' | 'explore') => void;
+        }
+      </signature>
+      <path>components/ModeSelector.tsx</path>
+    </interface>
+    <interface name="ModeIndicator Props" kind="component-props">
+      <signature>
+        interface ModeIndicatorProps {
+          mode: 'homework' | 'exam' | 'explore';
+        }
+      </signature>
+      <path>components/ModeIndicator.tsx</path>
+    </interface>
+  </interfaces>
+
+  <tests>
+    <standards>
+      Manual testing only (5-day timeline per architecture). Test on localhost:3000 during development.
+      Focus on: UI interactions, state management, responsive design, timing logic.
+      Run 'npm run build' to verify TypeScript and ESLint pass.
+    </standards>
+    <locations>
+      Manual testing checklist in story file. No automated tests for MVP.
+    </locations>
+    <ideas>
+      <test ac="1" idea="Open fresh session, verify mode selector appears before chat interface" />
+      <test ac="2" idea="Verify all 3 buttons render with correct icons and descriptions" />
+      <test ac="3" idea="Click each mode, verify sessionMode state updates and selector hides" />
+      <test ac="4" idea="After selection, verify mode indicator badge appears in header" />
+      <test ac="5" idea="Attempt to change mode mid-session, verify no UI allows it" />
+      <test ac="6" idea="Wait 10 seconds without selection, verify defaults to Homework Help" />
+      <test ac="7" idea="Test on mobile (375px), tablet (768px), desktop (1024px) - all buttons accessible" />
+      <test ac="all" idea="Run npm run build, verify no TypeScript or ESLint errors" />
+    </ideas>
+  </tests>
+</story-context>

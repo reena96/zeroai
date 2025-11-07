@@ -1,0 +1,132 @@
+<story-context id="bmad/bmm/workflows/4-implementation/story-context/template" v="1.0">
+  <metadata>
+    <epicId>2</epicId>
+    <storyId>3</storyId>
+    <title>Worked Example Scaffolding Logic</title>
+    <status>drafted</status>
+    <generatedAt>2025-11-07</generatedAt>
+    <generator>BMAD Story Context Workflow</generator>
+    <sourceStoryPath>docs/stories/2-3-worked-example-scaffolding-logic.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>a student</asA>
+    <iWant>the AI to show me a worked example of a similar problem when I'm stuck</iWant>
+    <soThat>I can learn the pattern without cognitive overload</soThat>
+    <tasks>
+- Define stuck detection logic (AC: #1, #6)
+  - Add to mode-specific prompts: trigger after 2+ failed attempts
+  - Homework mode: Trigger after 2 failed turns
+  - Exam mode: Trigger after 2 failed turns
+  - Exploration mode: Trigger after 3 failed turns
+
+- Implement worked example generation (AC: #2, #3, #5)
+  - Add prompt instruction: generate SIMILAR (not identical) problem
+  - Include example template in prompt
+  - Emphasize: NEVER solve exact problem
+
+- Add similarity guidance to prompts (AC: #5)
+  - Keep same problem type, change numbers
+  - Maintain same difficulty level
+
+- Implement return-to-problem flow (AC: #4)
+  - After worked example, restate original problem
+  - Continue Socratic dialogue
+
+- Add math notation preparation (AC: #7)
+  - Use LaTeX-style notation in worked examples
+  - Prepare for KaTeX rendering in Epic 3
+
+- Testing across problem types (AC: #8)
+  - Test with algebra, geometry, word problems
+  - Document examples in testing results
+    </tasks>
+  </story>
+
+  <acceptanceCriteria>
+1. System detects "stuck state": 2+ consecutive failed attempts OR no progress after 3 turns
+2. AI generates SIMILAR problem (not exact problem) with step-by-step solution
+3. Example format: "Let me show you a similar problem: [Example problem] Here's how to solve it: [Step 1, Step 2, Step 3]"
+4. After example, AI says: "Now can you apply this same method to solve your problem?"
+5. Never shows solution to student's exact problem (maintains learning value)
+6. Worked examples happen faster in Homework mode (2 turns) vs Exploration (3 turns)
+7. Examples use proper math notation (prepare for KaTeX in Epic 3)
+8. Tested with algebra, geometry, word problems
+  </acceptanceCriteria>
+
+  <artifacts>
+    <docs>
+      <doc path="docs/PRD.md" section="Scaffolded Socratic">
+        Research-backed approach: provide worked examples as "concrete hints" after 2 failed Socratic turns to prevent cognitive overload.
+      </doc>
+      <doc path="docs/stories/2-2-mode-aware-system-prompts.md">
+        Story 2.2 provides mode-specific prompts that Story 2.3 extends with worked example logic.
+      </doc>
+      <doc path="lib/prompts.ts" section="T2.3 Hint Ladder">
+        Existing hint ladder has Miss #3 level - worked examples integrate at this level.
+      </doc>
+    </docs>
+    <code>
+      <artifact path="lib/prompts.ts" kind="module" symbol="SOCRATIC_PROMPTS" reason="Add worked example instructions to mode prompts">
+        Mode-specific prompts from Story 2.2. Story 2.3 adds worked example scaffolding instructions to each mode.
+      </artifact>
+    </code>
+    <dependencies>
+      <node>
+        <dep name="openai" version="^6.8.0">LLM generates similar problems and worked examples</dep>
+      </node>
+    </dependencies>
+  </artifacts>
+
+  <constraints>
+    - This is a PROMPT-ONLY change - no new components or API changes
+    - LLM handles all detection and generation via prompt instructions
+    - Worked examples must use SIMILAR problems (different numbers, same structure)
+    - Mode-specific timing: homework/exam = 2 turns, exploration = 3 turns
+    - Examples must include verification step at end
+    - Use LaTeX-style notation ($...$) for math expressions
+    - Always return to original problem after example
+    - Maintain T1.2 rule: NEVER solve student's exact problem in example
+  </constraints>
+
+  <interfaces>
+    <interface name="Worked Example Template" kind="prompt-structure">
+      <signature>
+        "Let me show you a similar problem to help you understand the pattern:
+
+        **Similar Problem:** [New problem with different numbers]
+
+        **Solution Steps:**
+        1. [Step with explanation]
+        2. [Next step with explanation]
+        3. [Final answer]
+
+        Now, can you apply this same method to solve your original problem: [restate original]?"
+      </signature>
+      <path>lib/prompts.ts</path>
+    </interface>
+  </interfaces>
+
+  <tests>
+    <standards>
+      Manual testing with different problem types. Verify worked examples are SIMILAR not IDENTICAL.
+      Test mode-specific timing (2 vs 3 turns). Document all test cases.
+    </standards>
+    <locations>
+      Manual testing checklist in story file. Test via localhost:3000.
+    </locations>
+    <ideas>
+      <test ac="1" idea="Give 2 wrong answers to algebra problem, verify worked example triggered" />
+      <test ac="2" idea="Verify worked example shows DIFFERENT numbers than original (e.g., 2x+5=13 → example 3x+2=11)" />
+      <test ac="3" idea="Verify format includes 'Let me show you a similar problem' header" />
+      <test ac="4" idea="Verify AI restates original problem after worked example" />
+      <test ac="5" idea="Verify worked example NEVER solves student's exact problem" />
+      <test ac="6" idea="Test homework mode: worked example after 2 failed attempts" />
+      <test ac="6" idea="Test exploration mode: worked example after 3 failed attempts" />
+      <test ac="7" idea="Verify examples use LaTeX notation (e.g., → symbol, fractions)" />
+      <test ac="8" idea="Test algebra: '2x + 5 = 13' with 2 wrong answers" />
+      <test ac="8" idea="Test geometry: 'Area of triangle base=10, height=6' with 2 wrong answers" />
+      <test ac="8" idea="Test word problem: 'John has 3 apples...' with 2 wrong answers" />
+    </ideas>
+  </tests>
+</story-context>
