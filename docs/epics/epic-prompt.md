@@ -58,7 +58,7 @@ Sharded epics are numberedin docs/epics folder - epic-x-*.md. Execute Epic [EPIC
 
   AUTO-COMPACTION:
 
-  When token usage > 190k or after story completion:
+  When token usage > 190k:
 
   Create/update docs/handoff/epic[N]_handoff.md:
 
