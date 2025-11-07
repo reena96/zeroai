@@ -1,17 +1,34 @@
 import { OpenAI } from 'openai';
 import { NextRequest } from 'next/server';
 import { validateTextMath, logValidationDiscrepancy } from '@/lib/math-validator';
-import { SOCRATIC_PROMPT } from '@/lib/prompts';
+import { SOCRATIC_PROMPTS } from '@/lib/prompts';
+import type { SessionMode } from '@/store/chat';
 
 // Initialize OpenAI client
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+// Helper function to select prompt based on session mode
+function getPromptForMode(mode: SessionMode): string {
+  if (!mode) return SOCRATIC_PROMPTS.homework; // Default fallback
+
+  switch (mode) {
+    case 'homework':
+      return SOCRATIC_PROMPTS.homework;
+    case 'exam':
+      return SOCRATIC_PROMPTS.exam;
+    case 'explore':
+      return SOCRATIC_PROMPTS.explore;
+    default:
+      return SOCRATIC_PROMPTS.homework; // Fallback for any unexpected value
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
-    // Extract messages from request body
-    const { messages } = await req.json();
+    // Extract messages and sessionMode from request body
+    const { messages, sessionMode } = await req.json();
 
     if (!messages || !Array.isArray(messages)) {
       return new Response(
@@ -37,11 +54,14 @@ export async function POST(req: NextRequest) {
     // Take last 10 messages for context (to manage token usage)
     const contextMessages = messages.slice(-10);
 
-    // Add Socratic system prompt for accurate tutoring
+    // Select appropriate Socratic prompt based on session mode
+    const selectedPrompt = getPromptForMode(sessionMode);
+
+    // Add mode-aware system prompt for accurate tutoring
     const messagesWithSystem = [
       {
         role: 'system',
-        content: SOCRATIC_PROMPT,
+        content: selectedPrompt,
       },
       ...contextMessages,
     ];

@@ -5,7 +5,7 @@ import { useChatStore } from '@/store/chat';
 
 export default function MessageInput() {
   const [input, setInput] = useState('');
-  const { addMessage, isLoading, setLoading } = useChatStore();
+  const { addMessage, isLoading, setLoading, sessionMode } = useChatStore();
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
@@ -25,7 +25,7 @@ export default function MessageInput() {
       // Get conversation history from store
       const messages = useChatStore.getState().messages;
 
-      // Send request to API route
+      // Send request to API route with sessionMode
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
@@ -36,6 +36,7 @@ export default function MessageInput() {
             role: m.role,
             content: m.content,
           })),
+          sessionMode: sessionMode, // Pass mode for adaptive prompting
         }),
       });
 

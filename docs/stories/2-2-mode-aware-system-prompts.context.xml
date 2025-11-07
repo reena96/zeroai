@@ -1,0 +1,152 @@
+<story-context id="bmad/bmm/workflows/4-implementation/story-context/template" v="1.0">
+  <metadata>
+    <epicId>2</epicId>
+    <storyId>2</storyId>
+    <title>Mode-Aware System Prompts</title>
+    <status>drafted</status>
+    <generatedAt>2025-11-07</generatedAt>
+    <generator>BMAD Story Context Workflow</generator>
+    <sourceStoryPath>docs/stories/2-2-mode-aware-system-prompts.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>a student</asA>
+    <iWant>the AI's teaching style to match my selected context</iWant>
+    <soThat>I get the right pace and depth for my situation</soThat>
+    <tasks>
+- Create mode-specific prompt variants (AC: #1, #2, #3, #4)
+  - Update `/lib/prompts.ts` to export `SOCRATIC_PROMPTS` object
+  - Create base Socratic rules (shared across all modes)
+  - Create `HOMEWORK_HELP_PROMPT` variant
+  - Create `EXAM_PREP_PROMPT` variant
+  - Create `EXPLORATION_PROMPT` variant
+
+- Implement prompt selection logic (AC: #5)
+  - Modify `app/api/chat/route.ts` to accept `sessionMode` parameter
+  - Add prompt selection function
+  - Pass `sessionMode` from client to API route
+  - Use selected prompt in `messagesWithSystem` array
+
+- Ensure Socratic core maintained (AC: #7)
+  - All modes include "NEVER give direct answers" rule
+  - All modes include Tier 1-3 rules from existing prompt
+  - Only pacing and tone differ, not core principles
+
+- Testing mode-specific behavior (AC: #6)
+  - Test same problem in all 3 modes
+  - Verify observable differences in pacing
+  - Document differences in testing results
+    </tasks>
+  </story>
+
+  <acceptanceCriteria>
+1. Three separate system prompt variants created for each mode
+2. **Homework Help mode:**
+   - Question density: 2-3 questions per concept
+   - Tone: "Let's work through this efficiently"
+   - Faster to show scaffolding (after 2 turns vs 3)
+3. **Exam Prep mode:**
+   - Question density: 1-2 questions per concept
+   - Tone: "Quick review - you've got this"
+   - Assumes baseline mastery, fewer hints
+4. **Exploration mode:**
+   - Question density: 5-7 questions per concept
+   - Tone: "Let's explore this deeply"
+   - Patient, encourages "why" questions
+5. Correct prompt selected based on sessionMode
+6. Observable difference in AI behavior across modes (tested manually)
+7. All modes still NEVER give direct answers
+  </acceptanceCriteria>
+
+  <artifacts>
+    <docs>
+      <doc path="docs/PRD.md" section="Magic Moments">
+        Context-Aware Adaptation: AI adapts teaching style based on student's mode selection.
+      </doc>
+      <doc path="docs/architecture.md" section="API Structure">
+        /api/chat route handles LLM integration with system prompts.
+      </doc>
+      <doc path="docs/stories/2-1-context-mode-selection-ui.md">
+        Story 2.1 provides sessionMode state that Story 2.2 uses for prompt selection.
+      </doc>
+      <doc path="docs/stories/1-4-socratic-system-prompt-engineering.md">
+        Story 1.4 established base Socratic prompt - Story 2.2 extends it with mode variants.
+      </doc>
+    </docs>
+    <code>
+      <artifact path="lib/prompts.ts" kind="module" symbol="SOCRATIC_PROMPT" reason="Existing base prompt - extend with mode variants">
+        Current comprehensive Socratic prompt with Tier 1-3 rules. Story 2.2 will create mode-specific variants while preserving core principles.
+      </artifact>
+      <artifact path="app/api/chat/route.ts" kind="api-route" reason="LLM integration endpoint - add mode-based prompt selection" lines="need-to-find">
+        API route that sends messages to OpenAI. Needs to accept sessionMode parameter and select appropriate prompt.
+      </artifact>
+      <artifact path="store/chat.ts" kind="store" symbol="useChatStore" reason="Provides sessionMode state">
+        Zustand store with sessionMode added in Story 2.1. API client will read this to pass to backend.
+      </artifact>
+    </code>
+    <dependencies>
+      <node>
+        <dep name="openai" version="^6.8.0">LLM API client - already installed</dep>
+        <dep name="next" version="^15.0.0">Framework providing API routes</dep>
+      </node>
+    </dependencies>
+  </artifacts>
+
+  <constraints>
+    - Extend existing SOCRATIC_PROMPT from lib/prompts.ts - don't replace it
+    - All mode variants MUST include complete Tier 1-3 rules
+    - Mode-specific sections should be ADDITIONS, not replacements
+    - Use TypeScript for type-safe prompt selection
+    - sessionMode defaults to 'homework' if not provided
+    - Prompt selection happens server-side in API route
+    - No changes to existing Tier 1-3 rules structure
+    - Mode differences: pacing instructions, question density, scaffolding timing
+  </constraints>
+
+  <interfaces>
+    <interface name="SOCRATIC_PROMPTS Object" kind="module-export">
+      <signature>
+        export const SOCRATIC_PROMPTS = {
+          homework: string;
+          exam: string;
+          explore: string;
+        };
+      </signature>
+      <path>lib/prompts.ts</path>
+    </interface>
+    <interface name="getPromptForMode Function" kind="function">
+      <signature>
+        function getPromptForMode(mode: 'homework' | 'exam' | 'explore'): string;
+      </signature>
+      <path>app/api/chat/route.ts</path>
+    </interface>
+    <interface name="ChatAPI Request Body" kind="api-request">
+      <signature>
+        interface ChatAPIRequest {
+          messages: Array<{role: string; content: string}>;
+          sessionMode: 'homework' | 'exam' | 'explore';
+        }
+      </signature>
+      <path>app/api/chat/route.ts</path>
+    </interface>
+  </interfaces>
+
+  <tests>
+    <standards>
+      Manual testing with same problem across all 3 modes. Document observable behavior differences.
+      Verify Socratic core maintained (no direct answers) in all modes.
+      Run 'npm run build' to verify TypeScript compliance.
+    </standards>
+    <locations>
+      Manual testing documented in story file. Test via localhost:3000 with different mode selections.
+    </locations>
+    <ideas>
+      <test ac="1" idea="Verify SOCRATIC_PROMPTS object exports 3 mode variants" />
+      <test ac="2,3,4" idea="Test same problem 'Solve: 2x + 5 = 13' in all 3 modes, count questions before scaffolding" />
+      <test ac="5" idea="Verify getPromptForMode() selects correct prompt based on sessionMode" />
+      <test ac="6" idea="Document tone differences (efficient vs quick review vs exploratory)" />
+      <test ac="7" idea="In all 3 modes, verify AI never gives direct answer without being asked" />
+      <test ac="all" idea="Run npm run build, verify no TypeScript or ESLint errors" />
+    </ideas>
+  </tests>
+</story-context>

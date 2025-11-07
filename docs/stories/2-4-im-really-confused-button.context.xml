@@ -1,0 +1,152 @@
+<story-context id="bmad/bmm/workflows/4-implementation/story-context/template" v="1.0">
+  <metadata>
+    <epicId>2</epicId>
+    <storyId>4</storyId>
+    <title>I'm Really Confused Button</title>
+    <status>drafted</status>
+    <generatedAt>2025-11-07</generatedAt>
+    <generator>BMAD Story Context Workflow</generator>
+    <sourceStoryPath>docs/stories/2-4-im-really-confused-button.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>a student</asA>
+    <iWant>to click a button when I'm confused</iWant>
+    <soThat>I can immediately get deeper scaffolding without waiting</soThat>
+    <tasks>
+- Create ConfusedButton component (AC: #1, #3)
+  - Create `/components/ConfusedButton.tsx`
+  - Style as secondary button
+  - Add icon and label
+  - Position below each AI message
+
+- Implement click handler (AC: #2, #4, #5)
+  - On click: Inject system message to trigger scaffolding
+  - Track click in conversation metadata
+  - Send updated messages array to API
+
+- Trigger worked example on click (AC: #2)
+  - Reuse Story 2.3 worked example logic
+  - AI provides similar problem + solution
+
+- Implement pace check-in (AC: #7, #8)
+  - After worked example + 2-3 exchanges, ask about pacing
+  - Track in metadata: only show once per problem
+
+- Allow multiple clicks (AC: #6)
+  - Button always visible on AI messages
+  - Each click triggers new worked example
+
+- Testing (AC: all)
+  - Test button appears on all AI messages
+  - Test click triggers worked example
+  - Test pace check-in appears once
+    </tasks>
+  </story>
+
+  <acceptanceCriteria>
+1. "I'm really confused" button visible on every AI message
+2. Click triggers immediate worked example + deeper scaffolding (same as Story 2.3 logic)
+3. Button styled clearly but not intrusively (secondary button style)
+4. After clicking, AI responds: "No problem! Let me show you a similar example..."
+5. Button click tracked in conversation metadata
+6. Student can click multiple times if needed
+7. Adaptive pace check-in after scaffolding: "Feeling more confident? Want to continue at this pace?"
+8. Check-in happens max once per problem (not annoying)
+  </acceptanceCriteria>
+
+  <artifacts>
+    <docs>
+      <doc path="docs/PRD.md" section="Magic Moments - Student Agency">
+        "I'm really confused" button gives students control over scaffolding depth - they control timing, not AI.
+      </doc>
+      <doc path="docs/stories/2-3-worked-example-scaffolding-logic.md">
+        Story 2.3 provides worked example logic that Story 2.4 triggers on demand.
+      </doc>
+      <doc path="docs/stories/2-1-context-mode-selection-ui.md">
+        Story 2.1 shows pattern for creating UI components and integrating with state.
+      </doc>
+    </docs>
+    <code>
+      <artifact path="components/Message.tsx" kind="component" symbol="Message" reason="Add ConfusedButton to AI messages">
+        Message component displays individual messages. Story 2.4 adds ConfusedButton below AI messages.
+      </artifact>
+      <artifact path="store/chat.ts" kind="store" symbol="useChatStore" reason="Track confusion clicks and pace check metadata">
+        Zustand store needs to track confusedClicked and paceCheckShown metadata.
+      </artifact>
+      <artifact path="lib/prompts.ts" kind="module" reason="Add pace check-in logic to mode prompts">
+        Mode prompts from Stories 2.2 and 2.3 need pace check-in instructions added.
+      </artifact>
+    </code>
+    <dependencies>
+      <node>
+        <dep name="lucide-react" version="latest">Icon library for confused button icon</dep>
+        <dep name="nanoid" version="^5.1.6">ID generation for injected system messages</dep>
+      </node>
+    </dependencies>
+  </artifacts>
+
+  <constraints>
+    - Button on ALL AI messages (not just some)
+    - Secondary styling: gray background, not primary color
+    - Min 36px height for mobile tappability
+    - System message injection pattern: inject invisible message to trigger AI response
+    - Metadata tracking: {confusedClicked: boolean, paceCheckShown: boolean}
+    - Pace check-in: only once per problem, after 2-3 exchanges post-scaffolding
+    - Multiple clicks allowed: each generates NEW similar problem (not repeat)
+    - Icon options: question mark, confused emoji, or "💡" lightbulb
+  </constraints>
+
+  <interfaces>
+    <interface name="ConfusedButton Props" kind="component-props">
+      <signature>
+        interface ConfusedButtonProps {
+          onClick: () => void;
+        }
+      </signature>
+      <path>components/ConfusedButton.tsx</path>
+    </interface>
+    <interface name="ConversationMetadata" kind="type">
+      <signature>
+        interface ConversationMetadata {
+          confusedClicked: boolean;
+          confusedClickTimestamp: number | null;
+          paceCheckShown: boolean;
+        }
+      </signature>
+      <path>store/chat.ts</path>
+    </interface>
+    <interface name="System Message for Confusion" kind="message-format">
+      <signature>
+        {
+          id: nanoid(),
+          role: 'system',
+          content: "The student clicked 'I'm really confused'. Please provide a worked example of a SIMILAR problem with step-by-step solution.",
+          timestamp: Date.now()
+        }
+      </signature>
+      <path>Component click handler</path>
+    </interface>
+  </interfaces>
+
+  <tests>
+    <standards>
+      Manual testing focused on button visibility, click behavior, worked example triggering, and pace check-in.
+      Verify button appears on all AI messages. Test multiple clicks generate different examples.
+    </standards>
+    <locations>
+      Manual testing checklist in story file. Test via localhost:3000.
+    </locations>
+    <ideas>
+      <test ac="1" idea="Verify button appears on every AI message (not user messages)" />
+      <test ac="2" idea="Click button, verify AI provides worked example immediately" />
+      <test ac="3" idea="Verify button styling is secondary (gray, not primary color)" />
+      <test ac="4" idea="Verify AI response starts with 'No problem! Let me show you...'" />
+      <test ac="5" idea="Verify metadata tracks confusedClicked: true after click" />
+      <test ac="6" idea="Click button multiple times, verify each click generates different worked example" />
+      <test ac="7" idea="After worked example + 2-3 exchanges, verify pace check-in appears" />
+      <test ac="8" idea="Verify pace check-in only shows once (paceCheckShown prevents repeat)" />
+      <test ac="all" idea="Test button on mobile (375px), tablet (768px), desktop (1024px)" />
+    </ideas>
+  </tests>
+</story-context>
