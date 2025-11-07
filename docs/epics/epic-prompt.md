@@ -29,7 +29,8 @@ Sharded epics are numberedin docs/epics folder - epic-x-*.md. Execute Epic [EPIC
      - If critical issues: fix → re-run dev-story → re-run code-review
      - Update sprint-status.yaml: in-progress → review
 
-  6. Validation Guide
+  6. Validation Guide (REQUIRED - do not skip)
+     - ⚠️ BLOCKER: Must create validation guide before proceeding to step 8
      - Create docs/validation/epic[N]_[STORY_ID]_validation.md with:
        * 30-second quick test
        * Automated test results (unit, integration, coverage)
@@ -38,13 +39,14 @@ Sharded epics are numberedin docs/epics folder - epic-x-*.md. Execute Epic [EPIC
        * Rollback plan
        * Acceptance criteria checklist
 
-  7. Verify Complete
-     - All tests passing
-     - All acceptance criteria met
-     - Validation guide complete
-     - No critical TODOs
+  7. Verify Complete (GATE CHECK - verify all items)
+     - ✅ Validation guide created (docs/validation/epic[N]_[STORY_ID]_validation.md exists)
+     - ✅ All tests passing
+     - ✅ All acceptance criteria met
+     - ✅ No critical TODOs
+     - If any ❌: Fix issues before proceeding
 
-  8. Mark Done
+  8. Mark Done (only after step 7 passes)
      - Update sprint-status.yaml: review → done
      - Report: Story [STORY_ID] complete | Files: [list] | Tests: [pass/fail] | Coverage: [%] | Progress: [X/Y]
      - Commit relevant changes to the branch locally.
@@ -118,6 +120,22 @@ Sharded epics are numberedin docs/epics folder - epic-x-*.md. Execute Epic [EPIC
   Next: Story [NEXT_ID]
 
   COMPLETION (when all stories done):
+
+  Epic Validation Guide (REQUIRED before marking epic complete)
+     - ⚠️ BLOCKER: Must create epic validation guide before celebrating completion
+      - Read all per-story validation guides: docs/validation/epic[N]_*_validation.md
+      - Synthesize into docs/validation/epic[N]_validation.md with:
+         * Epic Overview
+            - Complete user journey across all stories
+            - Integration points and dependencies
+         * 30-second smoke test (end-to-end happy path)
+         * Critical validation scenarios (integrated flows)
+         * Edge cases affecting multiple stories
+         * Mobile/responsive validation
+         * Rollback plan
+         * Reference: Links to detailed per-story validation guides
+
+  After epic validation guide is created:
   🎉 EPIC [N] COMPLETE
 
   Stories: [Y/Y] ✓
