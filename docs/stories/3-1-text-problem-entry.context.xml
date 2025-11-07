@@ -1,0 +1,198 @@
+<story-context id="bmad/bmm/workflows/4-implementation/story-context/template" v="1.0">
+  <metadata>
+    <epicId>3</epicId>
+    <storyId>1</storyId>
+    <title>Text Problem Entry</title>
+    <status>drafted</status>
+    <generatedAt>2025-11-07</generatedAt>
+    <generator>BMAD Story Context Workflow</generator>
+    <sourceStoryPath>docs/stories/3-1-text-problem-entry.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>student</asA>
+    <iWant>type my math problem directly into the chat</iWant>
+    <soThat>I can get help quickly without needing an image</soThat>
+    <tasks>
+      - Task 1: Update MessageInput component to accept plain text math problems (AC: #1, #4)
+        - Subtask 1.1: Ensure MessageInput supports plain text math notation
+        - Subtask 1.2: Add placeholder text: "Type your math problem here..."
+        - Subtask 1.3: Test input with sample problems: algebra, arithmetic, geometry
+
+      - Task 2: Implement problem detection and confirmation flow (AC: #2, #3)
+        - Subtask 2.1: Enhance system prompt to detect math problems in user input
+        - Subtask 2.2: AI restates problem in first response: "I see you want to solve [problem]..."
+        - Subtask 2.3: Add confirmation pattern to Socratic prompts
+
+      - Task 3: Enable problem editing capability (AC: #6)
+        - Subtask 3.1: Allow student to clarify if AI misunderstood
+        - Subtask 3.2: AI asks clarifying questions if problem is ambiguous
+
+      - Task 4: Ensure smooth transition to Socratic dialogue (AC: #7)
+        - Subtask 4.1: After confirmation, AI begins Socratic questioning per mode
+        - Subtask 4.2: Test transition flow for all three modes (homework/exam/explore)
+
+      - Task 5: Test with required problem types (AC: #5)
+        - Subtask 5.1: Test algebra problems: "2x + 5 = 13", "solve for x: x^2 - 4 = 0"
+        - Subtask 5.2: Test arithmetic: "what is 15% of 80?", "calculate 3/4 + 2/3"
+        - Subtask 5.3: Test geometry text problems: "find the area of a circle with radius 5"
+    </tasks>
+  </story>
+
+  <acceptanceCriteria>
+    1. Student can type problem in regular chat input: "Solve for x: 2x + 5 = 13"
+    2. Problem parsed and confirmed before starting dialogue
+    3. AI responds: "I see you want to solve [problem]. Let's work through this together!"
+    4. Handles plain text math notation (no LaTeX required from student)
+    5. Works with algebra, arithmetic, geometry (text-describable problems)
+    6. Student can edit problem if AI misunderstood
+    7. Smooth transition from problem entry to Socratic dialogue
+  </acceptanceCriteria>
+
+  <artifacts>
+    <docs>
+      <doc>
+        <path>docs/PRD.md</path>
+        <title>Product Requirements Document</title>
+        <section>FR-1.1 Text Problem Entry</section>
+        <snippet>User can type math problem directly into text input. Support for plain text: "2x + 5 = 13". System parses and displays for confirmation. Acceptance: Successfully parse 95%+ of typed algebra/arithmetic problems.</snippet>
+      </doc>
+      <doc>
+        <path>docs/PRD.md</path>
+        <title>Product Requirements Document</title>
+        <section>FR-2.1 Conversation Flow</section>
+        <snippet>System prompt: "You are a patient math tutor. NEVER give direct answers. Guide through questions..." Flow: Parse problem → Inventory knowns → Identify goal → Guide method selection → Step through solution → Validate answer. Multi-turn conversation maintaining context across 10+ turns.</snippet>
+      </doc>
+      <doc>
+        <path>docs/architecture.md</path>
+        <title>Architecture Document</title>
+        <section>Novel Pattern: Context-Aware Socratic Prompting</section>
+        <snippet>Mode-aware system prompts with adjusted question density and scaffolding timing. Homework mode: 2-3 questions per concept. Exam mode: 1-2 questions. Exploration: 5-7 questions. Located in lib/prompts.ts</snippet>
+      </doc>
+      <doc>
+        <path>docs/architecture.md</path>
+        <title>Architecture Document</title>
+        <section>Project Structure</section>
+        <snippet>components/MessageInput.tsx - Input field + send button (Story 1.2, 3.1). lib/prompts.ts - Socratic system prompts (Story 1.4, 2.2). app/api/chat/route.ts - LLM Socratic dialogue endpoint.</snippet>
+      </doc>
+      <doc>
+        <path>docs/epics/epic-3-problem-input-math-rendering.md</path>
+        <title>Epic 3: Problem Input & Math Rendering</title>
+        <section>Story 3.1: Text Problem Entry</section>
+        <snippet>Technical Notes: Problem detection - Look for keywords "solve", "find", "calculate", numbers, variables. Confirmation - AI restates problem in first response. No complex parsing needed - LLM handles interpretation. Edge case: If ambiguous, AI asks clarifying question.</snippet>
+      </doc>
+    </docs>
+    <code>
+      <artifact>
+        <path>components/MessageInput.tsx</path>
+        <kind>component</kind>
+        <symbol>MessageInput</symbol>
+        <lines>1-160</lines>
+        <reason>Main text input component that needs placeholder update for math problem entry. Currently uses generic "Type your message..." - should change to "Type your math problem here...". Already handles text input and API calls.</reason>
+      </artifact>
+      <artifact>
+        <path>lib/prompts.ts</path>
+        <kind>library</kind>
+        <symbol>SOCRATIC_PROMPTS</symbol>
+        <lines>597-601</lines>
+        <reason>Core system prompts that need enhancement for problem detection and confirmation. Contains BASE_SOCRATIC_RULES and mode-specific prompts (homework/exam/explore). Must add problem confirmation logic: "When student first enters a math problem, IMMEDIATELY restate it for confirmation."</reason>
+      </artifact>
+      <artifact>
+        <path>app/api/chat/route.ts</path>
+        <kind>api-route</kind>
+        <symbol>POST</symbol>
+        <lines>28-219</lines>
+        <reason>API route that handles LLM calls. Uses getPromptForMode() to select appropriate prompt based on sessionMode. Should work as-is with enhanced prompts - no changes expected for this story.</reason>
+      </artifact>
+      <artifact>
+        <path>store/chat.ts</path>
+        <kind>store</kind>
+        <symbol>useChatStore</symbol>
+        <lines>40-211</lines>
+        <reason>Zustand store managing conversation state. Handles messages array, sessionMode, and metadata. addMessage() function used for adding user messages. No changes needed - already supports text message flow.</reason>
+      </artifact>
+    </code>
+    <dependencies>
+      <node>
+        <openai>^6.8.0</openai>
+        <nanoid>^5.1.6</nanoid>
+        <zustand>^5.0.8</zustand>
+        <next>^15.0.0</next>
+        <react>^18.3.0</react>
+        <mathjs>^15.0.0</mathjs>
+      </node>
+    </dependencies>
+  </artifacts>
+
+  <constraints>
+    - **No Complex Parsing Required**: LLM handles problem interpretation - do not implement regex-based math parsers or complex AST parsing. Let OpenAI GPT-4 detect and understand the problem from natural language.
+    - **Plain Text Only**: Students type natural language like "Solve for x: 2x + 5 = 13" - no LaTeX formatting required from user input. LaTeX rendering is output-only (Story 3.3).
+    - **Problem Confirmation Mandatory**: AI must restate problem in first response to confirm understanding before starting Socratic dialogue. Example: "I see you want to solve 2x + 5 = 13. Let's work through this together!"
+    - **Edge Case Handling**: If problem is ambiguous (e.g., "solve x" without equation), AI asks clarifying question rather than making assumptions. Example: "What equation should we solve for x?"
+    - **Existing Component Reuse**: All functionality implemented by enhancing existing files - NO new components or files required. MessageInput.tsx already handles text input, lib/prompts.ts already has mode-aware prompts.
+    - **Mode-Aware Confirmation**: Problem confirmation should adapt to session mode (efficient in homework, quick in exam, patient in explore).
+  </constraints>
+
+  <interfaces>
+    <interface>
+      <name>useChatStore.addMessage</name>
+      <kind>function</kind>
+      <signature>addMessage: (role: 'user' | 'assistant' | 'system', content: string) => void</signature>
+      <path>store/chat.ts</path>
+      <description>Adds message to conversation history. Used by MessageInput to add user's typed problem to chat.</description>
+    </interface>
+    <interface>
+      <name>POST /api/chat</name>
+      <kind>REST endpoint</kind>
+      <signature>POST /api/chat { messages: Message[], sessionMode: SessionMode } => ReadableStream</signature>
+      <path>app/api/chat/route.ts</path>
+      <description>Sends conversation history and session mode to OpenAI GPT-4. Returns streaming response with Socratic guidance. Uses mode-specific prompts from lib/prompts.ts</description>
+    </interface>
+    <interface>
+      <name>SOCRATIC_PROMPTS</name>
+      <kind>constant object</kind>
+      <signature>const SOCRATIC_PROMPTS: { homework: string, exam: string, explore: string }</signature>
+      <path>lib/prompts.ts</path>
+      <description>Mode-aware system prompts for Socratic tutoring. Each mode has different pacing and scaffolding instructions. Will be enhanced with problem detection and confirmation logic.</description>
+    </interface>
+  </interfaces>
+
+  <tests>
+    <standards>
+      Manual testing with documented test matrix per ADR-004 (docs/architecture.md#ADR-004). No automated tests required for MVP. Test across all three modes (homework/exam/explore). Verify 0% direct answer-giving rate per PRD FR-2.1.
+    </standards>
+    <locations>
+      No test directories defined for MVP. Manual testing documented in docs/test-results.md (Story 5.1).
+    </locations>
+    <ideas>
+      **AC #1, #4 Test Ideas (Plain text input):**
+      - Test algebra: "2x + 5 = 13", "solve for x: 3x - 7 = 20", "x^2 - 4 = 0"
+      - Test arithmetic: "what is 15% of 80?", "calculate 3/4 + 2/3"
+      - Test geometry: "find the area of a circle with radius 5", "perimeter of a rectangle 10 by 5"
+      - Verify no LaTeX required from student - plain text only
+
+      **AC #2, #3 Test Ideas (Problem confirmation):**
+      - Verify AI restates problem in first response for all problem types
+      - Check confirmation format: "I see you want to solve [problem]. Let's work through this together!"
+      - Test across all three modes (homework/exam/explore) for appropriate confirmation tone
+
+      **AC #5 Test Ideas (Problem type coverage):**
+      - Algebra (linear, quadratic)
+      - Arithmetic (fractions, percentages, decimals)
+      - Geometry (area, perimeter, volume - text-describable)
+      - Verify 95%+ correct understanding and restatement
+
+      **AC #6 Test Ideas (Edit capability):**
+      - Test ambiguous input: "solve x" (missing equation) → AI should ask clarifying question
+      - Test incomplete input: "area" → AI should ask "Area of what shape?"
+      - Verify AI doesn't make assumptions - always asks for clarification when ambiguous
+
+      **AC #7 Test Ideas (Smooth transition):**
+      - After problem confirmation, verify AI begins Socratic questioning (not direct answers)
+      - Test transition flow in homework mode (efficient but thorough)
+      - Test transition flow in exam mode (quick review)
+      - Test transition flow in explore mode (deep patient)
+      - Verify mode-specific pacing is maintained after confirmation
+    </ideas>
+  </tests>
+</story-context>

@@ -2,10 +2,16 @@
 
 import { useState } from 'react';
 import { useChatStore } from '@/store/chat';
+import { ImageUpload } from './ImageUpload';
 
 export default function MessageInput() {
   const [input, setInput] = useState('');
   const { addMessage, isLoading, setLoading, sessionMode, setStruggleState } = useChatStore();
+
+  // Handle extracted text from image upload
+  const handleImageExtract = (text: string) => {
+    setInput(text);
+  };
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
@@ -109,14 +115,18 @@ export default function MessageInput() {
   };
 
   return (
-    <div className="p-4">
+    <div className="p-4 space-y-3">
+      {/* Image Upload */}
+      <ImageUpload onExtract={handleImageExtract} />
+
+      {/* Text Input */}
       <div className="flex gap-2">
         <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyPress={handleKeyPress}
-          placeholder="Type your message..."
+          placeholder="Type your math problem here..."
           disabled={isLoading}
           className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
         />

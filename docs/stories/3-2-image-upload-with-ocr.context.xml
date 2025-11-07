@@ -1,0 +1,194 @@
+<story-context id="bmad/bmm/workflows/4-implementation/story-context/template" v="1.0">
+  <metadata>
+    <epicId>3</epicId>
+    <storyId>2</storyId>
+    <title>Image Upload with OCR</title>
+    <status>drafted</status>
+    <generatedAt>2025-11-07</generatedAt>
+    <generator>BMAD Story Context Workflow</generator>
+    <sourceStoryPath>docs/stories/3-2-image-upload-with-ocr.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>student</asA>
+    <iWant>upload a photo of my math problem</iWant>
+    <soThat>I don't have to type complex equations</soThat>
+    <tasks>
+      - Task 1: Create ImageUpload component with file picker and drag-drop support (AC: #1, #2, #3)
+      - Task 2: Implement image preview before submission (AC: #4)
+      - Task 3: Create /api/ocr endpoint with GPT-4 Vision integration (AC: #5, #6)
+      - Task 4: Display extracted problem with edit capability (AC: #7, #8)
+      - Task 5: Implement error handling and edge cases (AC: #9, #10)
+      - Task 6: Integrate ImageUpload into chat UI (AC: #1)
+    </tasks>
+  </story>
+
+  <acceptanceCriteria>
+    1. Image upload button visible in chat input area
+    2. Click opens file picker OR drag-drop zone appears
+    3. Supports JPG, PNG, PDF (max 10MB)
+    4. Image preview shown before submitting
+    5. Vision API (GPT-4 Vision or Google Cloud Vision) extracts problem text
+    6. Loading indicator during OCR: "Extracting problem..." (<5 seconds)
+    7. Extracted problem displayed for student confirmation
+    8. Student can edit extracted text if OCR made mistakes
+    9. 90%+ accuracy on printed text, 70%+ on clear handwritten
+    10. Graceful error handling: "Couldn't read image clearly. Please try typing the problem or upload a clearer photo."
+  </acceptanceCriteria>
+
+  <artifacts>
+    <docs>
+      <doc>
+        <path>docs/PRD.md</path>
+        <title>Product Requirements Document</title>
+        <section>FR-1.2 Image Upload with OCR</section>
+        <snippet>Drag-drop OR click-to-upload image file. Support formats: JPG, PNG, PDF. Vision LLM (GPT-4 Vision or similar) extracts problem text. Display extracted problem for user confirmation. User can edit if OCR made mistakes. Acceptance: 90%+ accuracy on printed text, 70%+ on clear handwritten.</snippet>
+      </doc>
+      <doc>
+        <path>docs/architecture.md</path>
+        <title>Architecture Document</title>
+        <section>ADR-003: GPT-4 Vision for OCR</section>
+        <snippet>Use GPT-4 Vision API (not separate OCR service). Same API as Socratic dialogue (unified billing). Understands mathematical notation. Can extract + interpret simultaneously. Simpler architecture (one provider). Good enough for printed text (90%+ accuracy). Handwritten accuracy lower (70% vs 85% with specialized).</snippet>
+      </doc>
+      <doc>
+        <path>docs/architecture.md</path>
+        <title>Architecture Document</title>
+        <section>Performance Considerations - Image Processing</section>
+        <snippet>Client-side Resize: Resize large images to max 2048px before upload. Compression: Convert to JPEG with 80% quality. Async Processing: Show loading state immediately. Targets: Upload + OCR <5s, Max file size 10MB, Focus: Printed text (90%+ accuracy).</snippet>
+      </doc>
+      <doc>
+        <path>docs/architecture.md</path>
+        <title>Architecture Document</title>
+        <section>Integration Points - GPT-4 Vision</section>
+        <snippet>model: 'gpt-4-vision-preview', messages with type 'image_url', url: data:image/jpeg;base64,${image}. Returns extracted problem text.</snippet>
+      </doc>
+      <doc>
+        <path>docs/epics/epic-3-problem-input-math-rendering.md</path>
+        <title>Epic 3: Problem Input & Math Rendering</title>
+        <section>Story 3.2: Image Upload with OCR</section>
+        <snippet>Technical Notes: Use GPT-4 Vision API or Google Cloud Vision API. File upload: input type="file" accept="image/*,application/pdf". Preview: Convert to base64 or object URL. OCR prompt: "Extract the math problem from this image. Return only the problem text, no explanations." Error handling: Network errors, unclear images, API failures.</snippet>
+      </doc>
+    </docs>
+    <code>
+      <artifact>
+        <path>components/MessageInput.tsx</path>
+        <kind>component</kind>
+        <symbol>MessageInput</symbol>
+        <lines>1-160</lines>
+        <reason>Will be modified to integrate ImageUpload component or receive extracted text via callback. Currently has placeholder "Type your math problem here..." - extracted OCR text should populate this input field.</reason>
+      </artifact>
+      <artifact>
+        <path>components/ChatContainer.tsx</path>
+        <kind>component</kind>
+        <symbol>ChatContainer</symbol>
+        <lines>1-50</lines>
+        <reason>Alternative integration point for ImageUpload component - may add upload UI here instead of MessageInput. Contains MessageInput and MessageList.</reason>
+      </artifact>
+      <artifact>
+        <path>app/api/chat/route.ts</path>
+        <kind>api-route</kind>
+        <symbol>POST</symbol>
+        <lines>1-220</lines>
+        <reason>Reference for API route pattern. Shows OpenAI client initialization, error handling with ApiResponse format, and structured logging. OCR endpoint should follow same patterns.</reason>
+      </artifact>
+      <artifact>
+        <path>lib/prompts.ts</path>
+        <kind>library</kind>
+        <symbol>SOCRATIC_PROMPTS</symbol>
+        <lines>61-92</lines>
+        <reason>Story 3.1 added T1.1A problem detection/confirmation. OCR-extracted text will flow through this same confirmation system - no changes needed to prompts.</reason>
+      </artifact>
+      <artifact>
+        <path>store/chat.ts</path>
+        <kind>store</kind>
+        <symbol>useChatStore</symbol>
+        <lines>1-212</lines>
+        <reason>Zustand store managing conversation state. Messages flow through addMessage(). No changes needed - OCR text becomes a user message like any typed text.</reason>
+      </artifact>
+    </code>
+    <dependencies>
+      <node>
+        <openai>^6.8.0</openai>
+        <react>^18.3.0</react>
+        <next>^15.0.0</next>
+        <nanoid>^5.1.6</nanoid>
+        <zustand>^5.0.8</zustand>
+      </node>
+    </dependencies>
+  </artifacts>
+
+  <constraints>
+    - **GPT-4 Vision API Required**: Per ADR-003, use gpt-4-vision-preview model, NOT Google Cloud Vision or other OCR services. Same provider as Socratic dialogue for unified billing.
+    - **Base64 Encoding**: Convert images to base64 for API transmission via data:image/jpeg;base64,${base64String} format.
+    - **Client-Side Resize**: Resize images larger than 2048px before upload to reduce API costs and improve performance. Target JPEG with 80% quality.
+    - **File Size Limit**: Maximum 10MB file size. Reject larger files with user-friendly message.
+    - **File Type Support**: Accept image/*,application/pdf (JPG, PNG, PDF only).
+    - **OCR Prompt**: Use exact prompt "Extract the math problem from this image. Return only the problem text." for consistency.
+    - **Performance Target**: Complete OCR in <5 seconds per architecture requirements.
+    - **Error Handling**: Use ApiResponse<T> format per architecture pattern. Provide fallback message: "Couldn't read image clearly. Please try typing the problem or upload a clearer photo."
+    - **Integration Pattern**: Extracted text populates MessageInput field (same as Story 3.1 text entry) - maintains consistent UX.
+    - **Component Pattern**: Must start with 'use client' directive per architecture requirements. Use named export (not default). Follow Tailwind styling patterns.
+  </constraints>
+
+  <interfaces>
+    <interface>
+      <name>POST /api/ocr</name>
+      <kind>REST endpoint</kind>
+      <signature>POST /api/ocr { image: string } => ApiResponse&lt;{ problem: string }&gt;</signature>
+      <path>app/api/ocr/route.ts</path>
+      <description>Accepts base64-encoded image, calls GPT-4 Vision API to extract math problem text. Returns extracted text or error. Follows same ApiResponse pattern as /api/chat.</description>
+    </interface>
+    <interface>
+      <name>ImageUpload onExtract callback</name>
+      <kind>function prop</kind>
+      <signature>onExtract: (text: string) => void</signature>
+      <path>components/ImageUpload.tsx</path>
+      <description>Callback function passed to ImageUpload component. Called with extracted OCR text. Implementation should populate MessageInput field with extracted text.</description>
+    </interface>
+    <interface>
+      <name>OpenAI Vision API</name>
+      <kind>external API</kind>
+      <signature>openai.chat.completions.create({ model: 'gpt-4-vision-preview', messages: [{ role: 'user', content: [text, image_url] }] })</signature>
+      <path>External (OpenAI SDK)</path>
+      <description>GPT-4 Vision API for image-to-text extraction. Accepts image via data URL, returns text content. Same client instance as Socratic dialogue API.</description>
+    </interface>
+  </interfaces>
+
+  <tests>
+    <standards>
+      Manual testing with documented test matrix per ADR-004 (docs/architecture.md#ADR-004). No automated tests required for MVP. Test with various image types (printed, handwritten, clear, blurry). Verify accuracy targets: 90%+ printed, 70%+ handwritten.
+    </standards>
+    <locations>
+      No test directories defined for MVP. Manual testing documented in docs/test-results.md (Story 5.1).
+    </locations>
+    <ideas>
+      **AC #1-4 Test Ideas (File Upload & Preview):**
+      - Test click-to-upload button opens file picker
+      - Test drag-drop zone accepts files
+      - Test file type validation (accept JPG, PNG, PDF; reject others)
+      - Test file size validation (accept ≤10MB; reject >10MB with message)
+      - Test image preview displays before submission
+      - Test remove/retry options work
+
+      **AC #5, #6, #9 Test Ideas (OCR Extraction):**
+      - Test printed text: Textbook equations, worksheet problems (target 90%+ accuracy)
+      - Test handwritten: Clear handwriting equations (target 70%+ accuracy)
+      - Test loading indicator shows "Extracting problem..." message
+      - Test extraction completes in <5 seconds
+      - Sample problems: "2x + 5 = 13", "x^2 - 4 = 0", "find area of circle r=5"
+
+      **AC #7, #8 Test Ideas (Edit Capability):**
+      - Test extracted text populates MessageInput
+      - Test student can edit extracted text before sending
+      - Test workflow: upload → preview → extract → edit → send
+      - Test image clears after successful extraction
+
+      **AC #10 Test Ideas (Error Handling):**
+      - Test unclear/blurry image: Should show fallback message
+      - Test API failure: Network error, rate limit, API key invalid
+      - Test unsupported file type: Should reject with message
+      - Test oversized file: Should reject before API call
+      - Verify all errors show user-friendly messages with fallback options
+    </ideas>
+  </tests>
+</story-context>

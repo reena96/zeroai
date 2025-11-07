@@ -86,7 +86,12 @@ zeroai/
 docs/
 ├── PRD.md                            # Product requirements
 ├── architecture.md                   # Technical architecture
-├── epics.md                          # All 5 epics defined
+├── epics/                            # All 5 epics defined (sharded)
+│   ├── epic-1-core-chat-infrastructure.md
+│   ├── epic-2-scaffolded-socratic-dialogue.md
+│   ├── epic-3-problem-input-math-rendering.md
+│   ├── epic-4-gamification-polish.md
+│   └── epic-5-testing-documentation-deployment.md
 ├── sprint-status.yaml                # ⭐ Epic 1 stories all "done"
 ├── stories/
 │   ├── 1-1-basic-web-app-setup-with-chat-ui-skeleton.md
@@ -352,7 +357,7 @@ npm run dev                           # Runs on http://localhost:3000
 ### **Must Read for Context:**
 1. `/docs/PRD.md` - Product vision, success criteria, market positioning
 2. `/docs/architecture.md` - Technical decisions, patterns, Math Academy vs Khanmigo
-3. `/docs/epics.md` - All 5 epics with story breakdown
+3. `/docs/epics/` - All 5 epics with story breakdown (sharded by epic)
 4. `/docs/prompt-update-summary.md` - What changed today in prompt
 5. `/docs/test-cases.md` - Demo test scenarios
 

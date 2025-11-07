@@ -128,7 +128,12 @@ zeroai/
 ├── README.md                         # Project documentation (Story 5.2)
 └── docs/
     ├── PRD.md                        # Product requirements
-    ├── epics.md                      # Epic breakdown
+    ├── epics/                        # Epic breakdown (sharded)
+    │   ├── epic-1-core-chat-infrastructure.md
+    │   ├── epic-2-scaffolded-socratic-dialogue.md
+    │   ├── epic-3-problem-input-math-rendering.md
+    │   ├── epic-4-gamification-polish.md
+    │   └── epic-5-testing-documentation-deployment.md
     ├── architecture.md               # This document
     ├── prompts.md                    # Prompt engineering notes (Story 5.2)
     └── test-results.md               # Testing documentation (Story 5.1)

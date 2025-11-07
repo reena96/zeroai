@@ -1,6 +1,6 @@
 import { OpenAI } from 'openai';
 import { NextRequest } from 'next/server';
-import { validateTextMath, logValidationDiscrepancy } from '@/lib/math-validator';
+import { validateTextMath, logValidationDiscrepancy, validateStudentAnswer } from '@/lib/math-validator';
 import { SOCRATIC_PROMPTS } from '@/lib/prompts';
 import type { SessionMode } from '@/store/chat';
 
@@ -54,10 +54,34 @@ export async function POST(req: NextRequest) {
     // Take last 10 messages for context (to manage token usage)
     const contextMessages = messages.slice(-10);
 
+    // STUDENT ANSWER VALIDATION: Check if latest user message contains an answer
+    let answerValidation = null;
+    try {
+      const lastUserMessage = contextMessages.filter(m => m.role === 'user').pop();
+      const conversationText = contextMessages.map(m => m.content).join('\n');
+
+      if (lastUserMessage) {
+        answerValidation = validateStudentAnswer(lastUserMessage.content, conversationText);
+
+        if (answerValidation.hasAnswer) {
+          console.log('[Student Answer Validation]', {
+            answer: answerValidation.studentAnswer,
+            isCorrect: answerValidation.isCorrect,
+            note: answerValidation.validationNote,
+          });
+        }
+      }
+    } catch (error) {
+      console.error('[Student Answer Validation Error]', error);
+      // Continue without validation if it fails
+      answerValidation = null;
+    }
+
     // Select appropriate Socratic prompt based on session mode
     const selectedPrompt = getPromptForMode(sessionMode);
 
     // Add mode-aware system prompt for accurate tutoring
+    // If we have answer validation, inject it as a system message
     const messagesWithSystem = [
       {
         role: 'system',
@@ -65,6 +89,14 @@ export async function POST(req: NextRequest) {
       },
       ...contextMessages,
     ];
+
+    // Inject validation note if we detected an answer
+    if (answerValidation?.validationNote) {
+      messagesWithSystem.push({
+        role: 'system',
+        content: answerValidation.validationNote,
+      });
+    }
 
     // STEP 1: Get complete response (non-streaming) for pre-validation
     console.log('[API] Generating response for pre-validation...');

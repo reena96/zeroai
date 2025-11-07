@@ -39,8 +39,15 @@ export default function MessageList() {
         </div>
       ) : (
         <div className="space-y-2">
-          {messages.map((message) => (
-            <Message key={message.id} message={message} />
+          {messages.map((message, index) => (
+            <Message
+              key={message.id}
+              message={message}
+              isLatestAssistantMessage={
+                message.role === 'assistant' &&
+                index === messages.length - 1
+              }
+            />
           ))}
         </div>
       )}

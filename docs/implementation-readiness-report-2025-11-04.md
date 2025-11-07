@@ -106,7 +106,7 @@ As a greenfield project, validation includes:
 | Document Type | File Path | Size | Last Modified | Status | Purpose |
 |--------------|-----------|------|---------------|--------|---------|
 | **PRD** | `/docs/PRD.md` | 25KB | Nov 3, 23:50 | ✅ Complete | Product Requirements Document defining zeroai AI Math Tutor features, success criteria, and functional/non-functional requirements |
-| **Epics & Stories** | `/docs/epics.md` | 39KB | Nov 4, 00:02 | ✅ Complete | Epic breakdown with 17 implementable stories across 5 epics, organized for 5-day sprint |
+| **Epics & Stories** | `/docs/epics/` | 39KB | Nov 4, 00:02 | ✅ Complete | Epic breakdown with 17 implementable stories across 5 epics, organized for 5-day sprint (sharded by epic) |
 | **Architecture** | `/docs/architecture.md` | 37KB | Nov 4, 11:32 | ✅ Complete | Technical architecture decisions, technology stack, implementation patterns, and consistency rules |
 | **Supporting Docs** | `/docs/brainstorming-session-complete-2025-11-03.md` | - | Nov 3 | ✅ Available | Brainstorming session results with concept exploration |
 | **Supporting Docs** | `/docs/research-competitive-2025-11-03.md` | - | Nov 3 | ✅ Available | Competitive research and market analysis |
