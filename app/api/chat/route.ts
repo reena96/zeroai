@@ -55,20 +55,26 @@ export async function POST(req: NextRequest) {
     const contextMessages = messages.slice(-10);
 
     // STUDENT ANSWER VALIDATION: Check if latest user message contains an answer
-    const lastUserMessage = contextMessages.filter(m => m.role === 'user').pop();
-    const conversationText = contextMessages.map(m => m.content).join('\n');
-
     let answerValidation = null;
-    if (lastUserMessage) {
-      answerValidation = validateStudentAnswer(lastUserMessage.content, conversationText);
+    try {
+      const lastUserMessage = contextMessages.filter(m => m.role === 'user').pop();
+      const conversationText = contextMessages.map(m => m.content).join('\n');
 
-      if (answerValidation.hasAnswer) {
-        console.log('[Student Answer Validation]', {
-          answer: answerValidation.studentAnswer,
-          isCorrect: answerValidation.isCorrect,
-          note: answerValidation.validationNote,
-        });
+      if (lastUserMessage) {
+        answerValidation = validateStudentAnswer(lastUserMessage.content, conversationText);
+
+        if (answerValidation.hasAnswer) {
+          console.log('[Student Answer Validation]', {
+            answer: answerValidation.studentAnswer,
+            isCorrect: answerValidation.isCorrect,
+            note: answerValidation.validationNote,
+          });
+        }
       }
+    } catch (error) {
+      console.error('[Student Answer Validation Error]', error);
+      // Continue without validation if it fails
+      answerValidation = null;
     }
 
     // Select appropriate Socratic prompt based on session mode
