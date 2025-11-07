@@ -17,6 +17,9 @@ export interface ConversationMetadata {
   confusedClicked: boolean;
   confusedClickTimestamp: number | null;
   paceCheckShown: boolean;
+  consecutiveExchanges: number; // Track conversation depth for button visibility
+  isStruggling: boolean; // LLM-detected struggle signals (incorrect attempts, confusion)
+  showConfusedButton: boolean; // Dynamic button visibility based on struggle state
 }
 
 // Chat store state interface
@@ -29,6 +32,7 @@ interface ChatState {
   clearMessages: () => void;
   setLoading: (loading: boolean) => void;
   setSessionMode: (mode: SessionMode) => void;
+  setStruggleState: (isStruggling: boolean) => void;
   triggerConfusedClick: () => Promise<void>;
 }
 
@@ -41,6 +45,9 @@ export const useChatStore = create<ChatState>((set, get) => ({
     confusedClicked: false,
     confusedClickTimestamp: null,
     paceCheckShown: false,
+    consecutiveExchanges: 0,
+    isStruggling: false,
+    showConfusedButton: false,
   },
 
   addMessage: (role, content) => {
@@ -53,6 +60,11 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
     set((state) => ({
       messages: [...state.messages, newMessage],
+      // Increment exchange counter when user or assistant messages are added
+      metadata: {
+        ...state.metadata,
+        consecutiveExchanges: role === 'system' ? state.metadata.consecutiveExchanges : state.metadata.consecutiveExchanges + 1,
+      },
     }));
   },
 
@@ -63,6 +75,9 @@ export const useChatStore = create<ChatState>((set, get) => ({
         confusedClicked: false,
         confusedClickTimestamp: null,
         paceCheckShown: false,
+        consecutiveExchanges: 0,
+        isStruggling: false,
+        showConfusedButton: false,
       },
     });
   },
@@ -73,6 +88,17 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
   setSessionMode: (mode) => {
     set({ sessionMode: mode });
+  },
+
+  setStruggleState: (isStruggling) => {
+    set((state) => ({
+      metadata: {
+        ...state.metadata,
+        isStruggling,
+        // Show button when struggling AND conversation is established (3+ exchanges)
+        showConfusedButton: isStruggling && state.metadata.consecutiveExchanges >= 6,
+      },
+    }));
   },
 
   // Story 2.4: Trigger confused button - injects system message and calls API
@@ -125,6 +151,10 @@ export const useChatStore = create<ChatState>((set, get) => ({
         throw new Error(`API error: ${response.status}`);
       }
 
+      // Read struggle state from response header
+      const struggleState = response.headers.get('X-Struggle-State');
+      const responseIsStruggling = struggleState === 'true';
+
       // Handle streaming response
       const reader = response.body?.getReader();
       const decoder = new TextDecoder();
@@ -161,6 +191,9 @@ export const useChatStore = create<ChatState>((set, get) => ({
         };
         set({ messages: updatedMessages });
       }
+
+      // Update struggle state based on API response
+      get().setStruggleState(responseIsStruggling);
 
       set({ isLoading: false });
     } catch (error) {

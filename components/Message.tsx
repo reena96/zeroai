@@ -12,11 +12,16 @@ export default function Message({ message }: MessageProps) {
   const isUser = message.role === 'user';
   const isSystem = message.role === 'system';
   const triggerConfusedClick = useChatStore((state) => state.triggerConfusedClick);
+  const showConfusedButton = useChatStore((state) => state.metadata.showConfusedButton);
 
   // System messages are not displayed (used for internal API communication)
   if (isSystem) {
     return null;
   }
+
+  // Show confused button based on LLM-detected struggle state and conversation depth
+  // This is dynamically set by the API based on student's performance
+  const shouldShowConfusedButton = !isUser && showConfusedButton;
 
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4`}>
@@ -45,8 +50,8 @@ export default function Message({ message }: MessageProps) {
           })}
         </div>
 
-        {/* Story 2.4: Confused button on AI messages */}
-        {!isUser && (
+        {/* Story 2.4: Confused button on AI messages (only after 3+ exchanges) */}
+        {shouldShowConfusedButton && (
           <ConfusedButton onClick={triggerConfusedClick} />
         )}
       </div>

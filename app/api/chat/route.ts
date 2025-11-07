@@ -78,7 +78,16 @@ export async function POST(req: NextRequest) {
 
     let responseText = completion.choices[0]?.message?.content || '';
 
-    // STEP 2: Pre-validate the response BEFORE streaming to user
+    // STEP 2: Parse struggle detection metadata from response
+    const struggleMatch = responseText.match(/\[STRUGGLE:(true|false)\]/);
+    const isStruggling = struggleMatch ? struggleMatch[1] === 'true' : false;
+
+    // Remove struggle marker from response (invisible to student)
+    if (struggleMatch) {
+      responseText = responseText.replace(/\[STRUGGLE:(true|false)\]\s*$/, '').trim();
+    }
+
+    // STEP 3: Pre-validate the response BEFORE streaming to user
     console.log('[API] Validating response...');
     const validation = await validateTextMath(responseText, true); // Enable Wolfram fallback
 
@@ -177,11 +186,12 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Return streaming response
+    // Return streaming response with struggle state in custom header
     return new Response(readableStream, {
       headers: {
         'Content-Type': 'text/plain; charset=utf-8',
         'Transfer-Encoding': 'chunked',
+        'X-Struggle-State': isStruggling.toString(), // Custom header for struggle detection
       },
     });
   } catch (error: any) {

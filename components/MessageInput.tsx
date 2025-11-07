@@ -5,7 +5,7 @@ import { useChatStore } from '@/store/chat';
 
 export default function MessageInput() {
   const [input, setInput] = useState('');
-  const { addMessage, isLoading, setLoading, sessionMode } = useChatStore();
+  const { addMessage, isLoading, setLoading, sessionMode, setStruggleState } = useChatStore();
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
@@ -44,6 +44,10 @@ export default function MessageInput() {
         throw new Error(`API error: ${response.status}`);
       }
 
+      // Read struggle state from response header
+      const struggleState = response.headers.get('X-Struggle-State');
+      const isStruggling = struggleState === 'true';
+
       // Handle streaming response
       const reader = response.body?.getReader();
       const decoder = new TextDecoder();
@@ -80,6 +84,9 @@ export default function MessageInput() {
         };
         useChatStore.setState({ messages: updatedMessages });
       }
+
+      // Update struggle state in store after response is complete
+      setStruggleState(isStruggling);
 
       setLoading(false);
     } catch (error) {
