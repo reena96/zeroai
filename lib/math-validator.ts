@@ -14,24 +14,71 @@ export interface MathValidationResult {
 /**
  * Extract mathematical expressions from text
  * Looks for patterns like: "2 + 2 = 4", "x = 5", "solve 3x + 5 = 11"
+ * Context-aware: skips explanatory sentences and incomplete expressions
  */
 export function extractMathExpressions(text: string): string[] {
   const expressions: string[] = [];
 
+  // Context indicators that suggest teaching/explanation rather than answer claims
+  const contextIndicators = [
+    'we have', 'we start', 'let\'s', 'to find', 'to solve', 'to isolate',
+    'which simplifies', 'which equals', 'which gives', 'this becomes',
+    'subtract', 'add', 'divide', 'multiply', 'first', 'then', 'next',
+    'if we', 'when we', 'after'
+  ];
+
   // Pattern 1: Equations with = sign
-  const equationPattern = /(?:^|\s)([a-zA-Z0-9\s\+\-\*\/\(\)\^\.]+=[a-zA-Z0-9\s\+\-\*\/\(\)\^\.]+)(?:\s|$)/g;
+  const equationPattern = /(?:^|\s)([a-zA-Z0-9\s\+\-\*\/\(\)\^\.]+=[a-zA-Z0-9\s\+\-\*\/\(\)\^\.]+)(?:\s|$|[,;.])/g;
   let match;
   while ((match = equationPattern.exec(text)) !== null) {
-    expressions.push(match[1].trim());
+    let expr = match[1].trim();
+
+    // Clean trailing punctuation
+    expr = expr.replace(/[.,;:!?]+$/, '');
+
+    // Skip if expression ends with an operator (incomplete)
+    if (/[\+\-\*\/=]\s*$/.test(expr)) {
+      continue;
+    }
+
+    // Skip if expression starts with an operator (malformed)
+    if (/^\s*[\+\-\*\/=]/.test(expr)) {
+      continue;
+    }
+
+    // Get context around the match to check if it's explanatory
+    const startPos = match.index;
+    const contextStart = Math.max(0, startPos - 30);
+    const contextBefore = text.substring(contextStart, startPos).toLowerCase();
+
+    // Skip if preceded by context indicators (teaching/explanation)
+    const hasContextIndicator = contextIndicators.some(indicator =>
+      contextBefore.includes(indicator)
+    );
+
+    if (hasContextIndicator) {
+      continue;
+    }
+
+    expressions.push(expr);
   }
 
-  // Pattern 2: Standalone expressions in context (e.g., "the answer is 42")
-  const numberPattern = /(?:answer|result|equals|is)\s+(-?\d+(?:\.\d+)?)/gi;
-  while ((match = numberPattern.exec(text)) !== null) {
-    expressions.push(match[1]);
+  // Pattern 2: Final answer statements (e.g., "So, x = 4")
+  const finalAnswerPattern = /(?:so|therefore|thus|answer is|result is|x\s*=|solution is)\s*[:.]?\s*([a-zA-Z0-9\s\+\-\*\/\(\)\^\.]+)/gi;
+  while ((match = finalAnswerPattern.exec(text)) !== null) {
+    let expr = match[1].trim();
+
+    // Clean trailing punctuation
+    expr = expr.replace(/[.,;:!?]+$/, '');
+
+    // Only include if it looks like a complete expression
+    if (expr.length > 0 && !/[\+\-\*\/=]\s*$/.test(expr)) {
+      expressions.push(expr);
+    }
   }
 
-  return expressions;
+  // Deduplicate expressions
+  return [...new Set(expressions)];
 }
 
 /**
@@ -114,9 +161,16 @@ export async function validateWithWolfram(query: string): Promise<MathValidation
     url.searchParams.set('format', 'plaintext');
     url.searchParams.set('output', 'json');
 
+    // Add timeout to prevent hanging
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+
     const response = await fetch(url.toString(), {
       headers: { 'Accept': 'application/json' },
+      signal: controller.signal,
     });
+
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
       return {
@@ -149,6 +203,16 @@ export async function validateWithWolfram(query: string): Promise<MathValidation
       expression: query,
     };
   } catch (error: any) {
+    // Handle timeout/abort specifically
+    if (error.name === 'AbortError') {
+      return {
+        isValid: false,
+        error: 'Wolfram Alpha request timed out (5s)',
+        method: 'wolfram',
+        expression: query,
+      };
+    }
+
     return {
       isValid: false,
       error: error.message || 'Wolfram Alpha request failed',
@@ -159,27 +223,16 @@ export async function validateWithWolfram(query: string): Promise<MathValidation
 }
 
 /**
- * Hybrid validation: Try mathjs first, fallback to Wolfram Alpha for complex expressions
+ * Validate mathematical expressions using mathjs only (fast, local)
+ * Wolfram Alpha removed for MVP - was causing 15+ second delays on every request
  */
 export async function validateMathExpression(
   expression: string,
-  useWolframFallback: boolean = false
+  useWolframFallback: boolean = false // Kept for API compatibility but ignored
 ): Promise<MathValidationResult> {
-  // First, try mathjs (fast, local)
-  const mathjsResult = validateWithMathJS(expression);
-
-  if (mathjsResult.isValid) {
-    return mathjsResult;
-  }
-
-  // If mathjs fails and Wolfram fallback is enabled, try Wolfram Alpha
-  if (useWolframFallback && process.env.WOLFRAM_APP_ID) {
-    console.log(`[Math Validator] mathjs failed for "${expression}", trying Wolfram Alpha...`);
-    return await validateWithWolfram(expression);
-  }
-
-  // Return mathjs error if no fallback
-  return mathjsResult;
+  // Use mathjs only - fast and sufficient for catching numerical errors
+  // Socratic prompts prevent direct answers anyway, so validation rarely needed
+  return validateWithMathJS(expression);
 }
 
 /**

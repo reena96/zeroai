@@ -1,6 +1,7 @@
 import { OpenAI } from 'openai';
 import { NextRequest } from 'next/server';
 import { validateTextMath, logValidationDiscrepancy } from '@/lib/math-validator';
+import { SOCRATIC_PROMPT } from '@/lib/prompts';
 
 // Initialize OpenAI client
 const openai = new OpenAI({
@@ -36,25 +37,11 @@ export async function POST(req: NextRequest) {
     // Take last 10 messages for context (to manage token usage)
     const contextMessages = messages.slice(-10);
 
-    // Add enhanced system prompt for accurate Socratic tutoring
+    // Add Socratic system prompt for accurate tutoring
     const messagesWithSystem = [
       {
         role: 'system',
-        content: `You are a precise and careful math tutor for K-12 students. Guide students through problems using the Socratic method.
-
-CRITICAL ACCURACY RULES:
-- Before stating ANY numerical answer or equation, mentally verify it is 100% correct
-- Double-check all arithmetic, algebra, and calculations
-- If uncertain about a calculation, say "Let me verify that step..."
-- NEVER state incorrect math - accuracy is more important than speed
-
-TEACHING APPROACH:
-- Ask guiding questions rather than giving direct answers
-- Break complex problems into smaller steps
-- Encourage students to think through each step
-- Celebrate correct reasoning
-
-Remember: You are teaching students who trust you completely. One incorrect answer damages that trust and teaches the wrong method.`,
+        content: SOCRATIC_PROMPT,
       },
       ...contextMessages,
     ];
@@ -66,7 +53,7 @@ Remember: You are teaching students who trust you completely. One incorrect answ
       model: 'gpt-4',
       messages: messagesWithSystem,
       stream: false, // Get complete response first
-      temperature: 0.7,
+      temperature: 0.3, // Lower temperature for more consistent anti-apology behavior
     });
 
     let responseText = completion.choices[0]?.message?.content || '';
@@ -94,29 +81,54 @@ Remember: You are teaching students who trust you completely. One incorrect answ
         logValidationDiscrepancy(responseText, v, 'Pre-validation failed');
       });
 
-      // RETRY: Ask GPT-4 to correct itself
-      const correctionPrompt = {
-        role: 'user',
-        content: `I noticed a potential error in your last response. Let me verify: ${invalidExpressions[0].expression}. Please double-check your math and provide the correct guidance.`,
-      };
-
-      const retryCompletion = await openai.chat.completions.create({
-        model: 'gpt-4',
-        messages: [...messagesWithSystem, completion.choices[0].message, correctionPrompt],
-        stream: false,
-        temperature: 0.7,
+      // Only retry if we have actual answer claims that failed (not just unsolvable variables)
+      const needsCorrection = invalidExpressions.some(v => {
+        const expr = v.expression || '';
+        // Skip retry if it's just an unsolvable variable equation (teaching context)
+        const hasVariables = /[a-zA-Z]/.test(expr);
+        const isEquation = expr.includes('=');
+        // Only correct if it's a numerical claim or solved equation
+        return !hasVariables || (isEquation && !v.error?.includes('Undefined symbol'));
       });
 
-      responseText = retryCompletion.choices[0]?.message?.content || responseText;
+      if (needsCorrection) {
+        // RETRY: Ask GPT-4 to correct itself
+        const correctionPrompt = {
+          role: 'user',
+          content: `I noticed a potential error in your last response. Let me verify: ${invalidExpressions[0].expression}. Please double-check your math and provide the correct guidance.`,
+        };
 
-      // Validate retry
-      const retryValidation = await validateTextMath(responseText, true);
+        const retryCompletion = await openai.chat.completions.create({
+          model: 'gpt-4',
+          messages: [...messagesWithSystem, completion.choices[0].message, correctionPrompt],
+          stream: false,
+          temperature: 0.3, // Match main temperature for consistency
+        });
 
-      if (retryValidation.allValid || retryValidation.expressions.length === 0) {
-        console.log('[Math Pre-Validation] ✅ Correction successful');
+        responseText = retryCompletion.choices[0]?.message?.content || responseText;
+
+        // Validate retry
+        const retryValidation = await validateTextMath(responseText, true);
+
+        if (retryValidation.allValid || retryValidation.expressions.length === 0) {
+          console.log('[Math Pre-Validation] ✅ Correction successful');
+        } else {
+          const stillInvalid = retryValidation.validations.filter(v => !v.isValid);
+          // Only add warning if we still have invalid numerical claims
+          const hasInvalidNumericalClaims = stillInvalid.some(v => {
+            const expr = v.expression || '';
+            return !/[a-zA-Z]/.test(expr); // Pure numerical expression
+          });
+
+          if (hasInvalidNumericalClaims) {
+            console.error('[Math Pre-Validation] ❌ Correction failed, streaming with warning');
+            responseText += '\n\n_[Note: I\'m having difficulty verifying this calculation. Please double-check this answer independently.]_';
+          } else {
+            console.log('[Math Pre-Validation] ⚠️ Validation inconclusive (teaching context), proceeding without warning');
+          }
+        }
       } else {
-        console.error('[Math Pre-Validation] ❌ Correction failed, streaming with warning');
-        responseText += '\n\n_[Note: I\'m having difficulty verifying this calculation. Please double-check this answer independently or ask your teacher.]_';
+        console.log('[Math Pre-Validation] ⚠️ Validation failures appear to be teaching context, skipping correction');
       }
     } else if (validation.expressions.length > 0) {
       console.log('[Math Pre-Validation] ✅ All math validated:', {
