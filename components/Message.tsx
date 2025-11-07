@@ -7,9 +7,10 @@ import { MathText } from './MathText';
 
 interface MessageProps {
   message: MessageType;
+  isLatestAssistantMessage?: boolean;
 }
 
-export default function Message({ message }: MessageProps) {
+export default function Message({ message, isLatestAssistantMessage = false }: MessageProps) {
   const isUser = message.role === 'user';
   const isSystem = message.role === 'system';
   const triggerConfusedClick = useChatStore((state) => state.triggerConfusedClick);
@@ -20,9 +21,9 @@ export default function Message({ message }: MessageProps) {
     return null;
   }
 
-  // Show confused button based on LLM-detected struggle state and conversation depth
-  // This is dynamically set by the API based on student's performance
-  const shouldShowConfusedButton = !isUser && showConfusedButton;
+  // Show confused button ONLY on the LATEST assistant message
+  // when struggle state is detected and conversation depth >= 6 exchanges
+  const shouldShowConfusedButton = isLatestAssistantMessage && showConfusedButton;
 
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4`}>
