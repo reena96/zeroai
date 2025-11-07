@@ -163,6 +163,25 @@
 - **Expected:** AI confirms problem (LaTeX rendering tested in Story 3.3)
 - **Pass Criteria:** ✅ Problem detected despite LaTeX delimiters
 
+### Edge Case 5: New Problem Mid-Conversation
+- **Scenario:** Student finishes one problem and starts a completely different one
+- **Steps:**
+  1. Type "solve x^2 - 9 = 0"
+  2. AI confirms and helps solve (x = 3, x = -3)
+  3. Student replies "X = -3?" (confirming understanding)
+  4. AI affirms the solution
+  5. Student types NEW problem: "3x - y = 7, 2x + y = 8. what is x and y"
+- **Expected:** AI detects this is a NEW problem (system of equations vs. quadratic)
+- **Expected:** AI confirms: "I see you want to solve the system of equations: 3x - y = 7 and 2x + y = 8. Let's work through this together!"
+- **Expected:** AI does NOT apologize (student is not correcting, they're starting fresh)
+- **Pass Criteria:** ✅ New problem confirmed, ✅ No apology, ✅ Fresh Socratic dialogue
+- **Failure Mode:** ❌ AI apologizes for "confusion" or treats it as continuation of x² - 9 = 0
+
+**Why This Matters:**
+- Students often solve multiple problems in one session
+- Different equation types = different problems (quadratic → system of equations)
+- AI should be confident when student moves to new problem, not apologetic
+
 ---
 
 ## Rollback Plan
@@ -205,8 +224,8 @@ Per Story 3.1 requirements:
 - [ ] **AC #3:** AI restates problem for confirmation before Socratic dialogue
   - **Tests:** TC 1.1, 1.2, 1.3, 1.4
 
-- [ ] **AC #4:** Confirmation happens ONLY on first user message (not repeated)
-  - **Test:** TC 5.1
+- [ ] **AC #4:** Confirmation happens on first message AND when new problem introduced mid-conversation
+  - **Tests:** TC 5.1 (no repeat on same problem), Edge Case 5 (confirm on new problem)
 
 - [ ] **AC #5:** Ambiguous input triggers clarifying questions
   - **Tests:** TC 2.1, 2.2, 2.3
@@ -241,6 +260,7 @@ Per Story 3.1 requirements:
 | TC 3.2 - Challenge mode | ⬜ Pass / ⬜ Fail | |
 | TC 4.1 - Placeholder | ⬜ Pass / ⬜ Fail | |
 | TC 5.1 - No repeat | ⬜ Pass / ⬜ Fail | |
+| Edge Case 5 - New problem mid-conversation | ⬜ Pass / ⬜ Fail | |
 
 **Overall Status:** ⬜ PASS / ⬜ FAIL
 
