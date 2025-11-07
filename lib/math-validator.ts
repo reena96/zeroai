@@ -285,3 +285,99 @@ export function logValidationDiscrepancy(
     suggestion: 'Consider fine-tuning prompts or flagging for human review',
   });
 }
+
+/**
+ * Student Answer Validation Result
+ */
+export interface StudentAnswerValidation {
+  hasAnswer: boolean; // Did we detect a potential answer?
+  isCorrect: boolean | null; // null if we couldn't validate
+  studentAnswer?: string; // The extracted answer
+  expectedAnswer?: string; // What we calculated as correct
+  validationNote?: string; // Context to inject into LLM
+}
+
+/**
+ * Validate a student's answer in context
+ * Detects potential answers and validates them against expected results
+ * Returns validation result to inject into LLM context
+ */
+export function validateStudentAnswer(
+  userMessage: string,
+  conversationContext: string
+): StudentAnswerValidation {
+  // Extract potential numerical answers from user message
+  // Look for patterns: standalone numbers, "y = 2", "x = 3", etc.
+
+  const trimmed = userMessage.trim();
+
+  // Pattern 1: Just a number (e.g., "5", "2", "-3", "0.5")
+  const numberMatch = trimmed.match(/^-?\d+(\.\d+)?$/);
+  if (numberMatch) {
+    return {
+      hasAnswer: true,
+      isCorrect: null, // Need context to validate
+      studentAnswer: trimmed,
+      validationNote: `Student answered: ${trimmed}`,
+    };
+  }
+
+  // Pattern 2: Variable assignment (e.g., "x = 3", "y = 2")
+  const varMatch = trimmed.match(/^([a-z])\s*=\s*(-?\d+(\.\d+)?)$/i);
+  if (varMatch) {
+    const variable = varMatch[1];
+    const value = varMatch[2];
+
+    // Try to validate by checking if substitution works
+    // Look in conversation for equations containing this variable
+    const equationPattern = new RegExp(`([^=]+${variable}[^=]*=\\s*\\d+)`, 'i');
+    const eqMatch = conversationContext.match(equationPattern);
+
+    if (eqMatch) {
+      try {
+        // Extract equation like "2x + y = 8"
+        const equation = eqMatch[1];
+        // Substitute student's value and check
+        const substituted = equation.replace(new RegExp(variable, 'gi'), value);
+        const validation = validateWithMathJS(substituted);
+
+        if (validation.result === 'true') {
+          return {
+            hasAnswer: true,
+            isCorrect: true,
+            studentAnswer: `${variable} = ${value}`,
+            validationNote: `[VALIDATION: Student answered ${variable} = ${value} - CORRECT]`,
+          };
+        } else {
+          return {
+            hasAnswer: true,
+            isCorrect: false,
+            studentAnswer: `${variable} = ${value}`,
+            validationNote: `[VALIDATION: Student answered ${variable} = ${value} - INCORRECT. Check calculation before affirming.]`,
+          };
+        }
+      } catch (error) {
+        // Couldn't validate - let LLM handle it
+        return {
+          hasAnswer: true,
+          isCorrect: null,
+          studentAnswer: `${variable} = ${value}`,
+          validationNote: `Student answered: ${variable} = ${value}`,
+        };
+      }
+    }
+
+    return {
+      hasAnswer: true,
+      isCorrect: null,
+      studentAnswer: `${variable} = ${value}`,
+      validationNote: `Student answered: ${variable} = ${value}`,
+    };
+  }
+
+  // No clear answer detected
+  return {
+    hasAnswer: false,
+    isCorrect: null,
+  };
+}
