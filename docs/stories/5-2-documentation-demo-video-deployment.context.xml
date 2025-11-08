@@ -1,0 +1,229 @@
+<story-context id="bmad/bmm/workflows/4-implementation/story-context/template" v="1.0">
+  <metadata>
+    <epicId>5</epicId>
+    <storyId>5.2</storyId>
+    <title>Documentation, Demo Video & Deployment</title>
+    <status>drafted</status>
+    <generatedAt>2025-11-08</generatedAt>
+    <generator>BMAD Story Context Workflow</generator>
+    <sourceStoryPath>docs/stories/5-2-documentation-demo-video-deployment.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>a Gauntlet judge and future user</asA>
+    <iWant>clear documentation and a working deployment</iWant>
+    <soThat>I can easily understand, evaluate, and use the product</soThat>
+    <tasks>
+      <task id="1" ac="1">
+        <description>Create comprehensive README.md</description>
+        <subtasks>
+          <subtask id="1.1">Write project overview with unique value proposition</subtask>
+          <subtask id="1.2">Document setup instructions (clone, install, env vars, run)</subtask>
+          <subtask id="1.3">List technology stack with versions</subtask>
+          <subtask id="1.4">Highlight key features (context modes, scaffolding, gamification)</subtask>
+          <subtask id="1.5">Create 5+ example problem walkthroughs with screenshots</subtask>
+        </subtasks>
+      </task>
+      <task id="2" ac="2">
+        <description>Create prompt engineering documentation</description>
+        <subtasks>
+          <subtask id="2.1">Create docs/prompts.md file</subtask>
+          <subtask id="2.2">Document system prompts for all 3 modes (Homework, Exam, Exploration)</subtask>
+          <subtask id="2.3">Document worked example scaffolding logic</subtask>
+          <subtask id="2.4">Add iteration notes and learnings from development</subtask>
+        </subtasks>
+      </task>
+      <task id="3" ac="3">
+        <description>Create demo video</description>
+        <subtasks>
+          <subtask id="3.1">Record text problem entry and Socratic dialogue</subtask>
+          <subtask id="3.2">Record image upload with OCR (if functional)</subtask>
+          <subtask id="3.3">Demonstrate all 3 context modes (Homework, Exam, Exploration)</subtask>
+          <subtask id="3.4">Show "I'm confused" button → worked example flow</subtask>
+          <subtask id="3.5">Capture celebration animation and streak increment</subtask>
+          <subtask id="3.6">Add voiceover explaining unique features</subtask>
+          <subtask id="3.7">Edit to 5 minutes maximum length</subtask>
+        </subtasks>
+      </task>
+      <task id="4" ac="4">
+        <description>Deploy application</description>
+        <subtasks>
+          <subtask id="4.1">Choose deployment platform (Vercel recommended)</subtask>
+          <subtask id="4.2">Configure environment variables in deployment platform</subtask>
+          <subtask id="4.3">Deploy application to production</subtask>
+          <subtask id="4.4">Verify public URL is accessible</subtask>
+          <subtask id="4.5">Test deployed version (no broken links, no console errors)</subtask>
+          <subtask id="4.6">Validate performance on deployed version</subtask>
+        </subtasks>
+      </task>
+      <task id="5" ac="1,2,3,4">
+        <description>Final validation and polish</description>
+        <subtasks>
+          <subtask id="5.1">Review all documentation for clarity and completeness</subtask>
+          <subtask id="5.2">Test demo video playback and quality</subtask>
+          <subtask id="5.3">Verify deployed app meets all Gauntlet criteria</subtask>
+          <subtask id="5.4">Update README with deployed URL</subtask>
+          <subtask id="5.5">Final check of all acceptance criteria</subtask>
+        </subtasks>
+      </task>
+    </tasks>
+  </story>
+
+  <acceptanceCriteria>
+    <criterion id="1">
+      <description>README.md created with project overview, setup instructions, technology stack, feature highlights, and 5+ example problem walkthroughs</description>
+    </criterion>
+    <criterion id="2">
+      <description>Prompt Engineering Documentation (/docs/prompts.md) with system prompts for all 3 modes, worked example scaffolding logic, and iteration notes</description>
+    </criterion>
+    <criterion id="3">
+      <description>Demo Video (5 minutes) showing text problem entry, image upload with OCR, all 3 context modes, confused button, celebration animation, and voiceover explaining features</description>
+    </criterion>
+    <criterion id="4">
+      <description>Deployment to Vercel/Netlify with public URL accessible, environment variables configured, no broken links or console errors, and validated performance</description>
+    </criterion>
+  </acceptanceCriteria>
+
+  <artifacts>
+    <docs>
+      <doc>
+        <path>docs/PRD.md</path>
+        <title>Product Requirements Document</title>
+        <section>Executive Summary</section>
+        <snippet>AI Math Tutor - Socratic Learning Assistant for K-12 students. Context-aware adaptation (Homework/Exam/Exploration modes), student agency through "I'm confused" button, celebration/motivation gamification, scaffolded Socratic method (research-backed).</snippet>
+      </doc>
+      <doc>
+        <path>docs/PRD.md</path>
+        <title>Product Requirements Document</title>
+        <section>Success Criteria - Gauntlet Competition</section>
+        <snippet>Pedagogical Quality (35%): Scaffolded Socratic method, never gives direct answers, context-aware pacing. Technical Implementation (30%): Production-ready, OCR/Vision, math rendering, clean architecture. UX (20%): Intuitive chat, clear mode selection. Innovation (15%): Context-aware modes, student agency.</snippet>
+      </doc>
+      <doc>
+        <path>docs/architecture.md</path>
+        <title>Architecture Document</title>
+        <section>Executive Summary</section>
+        <snippet>Next.js 15 with App Router, TypeScript, Zustand for state, OpenAI GPT-4 for Socratic dialogue + Vision for OCR, Vercel deployment. Unique challenges: Context-aware prompting, scaffolded learning, real-time streaming, math rendering, gamification persistence.</snippet>
+      </doc>
+      <doc>
+        <path>docs/architecture.md</path>
+        <title>Architecture Document</title>
+        <section>Decision Summary</section>
+        <snippet>Framework: Next.js 15, Language: TypeScript, Styling: Tailwind CSS, LLM: OpenAI GPT-4, Vision/OCR: GPT-4 Vision, Math Rendering: KaTeX, State: Zustand, Animations: canvas-confetti, Deployment: Vercel, Testing: Manual only (5-day timeline).</snippet>
+      </doc>
+      <doc>
+        <path>docs/test-results.md</path>
+        <title>Test Results - Cross-Problem-Type Testing & Validation</title>
+        <section>Executive Summary</section>
+        <snippet>20/20 test scenarios passed (100%). All 5 problem types successfully guided through Socratic dialogue. Mode-specific pacing clearly observable. Worked example scaffolding triggers appropriately. Math rendering perfect. Performance excellent: LLM &lt;2s. Deployment readiness: Ready for Gauntlet submission. Note: OCR not tested end-to-end.</snippet>
+      </doc>
+      <doc>
+        <path>docs/epics/epic-5-testing-documentation-deployment.md</path>
+        <title>Epic 5: Testing, Documentation & Deployment</title>
+        <section>Story 5.2 Details</section>
+        <snippet>Create comprehensive README with setup instructions, technology stack, feature highlights. Document prompt engineering (system prompts for all 3 modes, scaffolding logic). Create 5-min demo video showing all features. Deploy to Vercel with public URL, env vars configured, validated performance.</snippet>
+      </doc>
+    </docs>
+    <code>
+      <artifact>
+        <path>app/page.tsx</path>
+        <kind>component</kind>
+        <symbol>Home</symbol>
+        <reason>Main chat interface - reference for feature documentation in README</reason>
+      </artifact>
+      <artifact>
+        <path>app/api/chat/route.ts</path>
+        <kind>api-route</kind>
+        <symbol>POST handler</symbol>
+        <reason>Socratic dialogue API endpoint - document in prompts.md for system prompt implementation</reason>
+      </artifact>
+      <artifact>
+        <path>app/api/ocr/route.ts</path>
+        <kind>api-route</kind>
+        <symbol>POST handler</symbol>
+        <reason>OCR/Vision API endpoint - reference for image upload feature documentation</reason>
+      </artifact>
+      <artifact>
+        <path>components/ModeSelector.tsx</path>
+        <kind>component</kind>
+        <symbol>ModeSelector</symbol>
+        <reason>Context mode selection UI - key differentiator to highlight in README and demo</reason>
+      </artifact>
+      <artifact>
+        <path>components/ConfusedButton.tsx</path>
+        <kind>component</kind>
+        <symbol>ConfusedButton</symbol>
+        <reason>Student agency feature - showcase in demo video and README</reason>
+      </artifact>
+      <artifact>
+        <path>components/MathText.tsx</path>
+        <kind>component</kind>
+        <symbol>MathText</symbol>
+        <reason>KaTeX math rendering - document technical implementation in README</reason>
+      </artifact>
+      <artifact>
+        <path>components/ImageUpload.tsx</path>
+        <kind>component</kind>
+        <symbol>ImageUpload</symbol>
+        <reason>OCR feature component - showcase in demo video</reason>
+      </artifact>
+    </code>
+    <dependencies>
+      <ecosystem name="node">
+        <package name="next" version="^15.0.0">Next.js framework for React with App Router</package>
+        <package name="react" version="^18.3.0">React library</package>
+        <package name="openai" version="^6.8.0">OpenAI API client for GPT-4 and Vision</package>
+        <package name="zustand" version="^5.0.8">State management for gamification (streaks, counters)</package>
+        <package name="katex" version="^0.16.25">Math rendering library</package>
+        <package name="lucide-react" version="^0.553.0">Icon library for UI</package>
+        <package name="typescript" version="^5">TypeScript for type safety</package>
+        <package name="tailwindcss" version="^3.4.1">Utility-first CSS framework</package>
+      </ecosystem>
+    </dependencies>
+  </artifacts>
+
+  <constraints>
+    <constraint>Documentation must be clear and accessible to both technical (developers) and non-technical (Gauntlet judges, users) audiences</constraint>
+    <constraint>README must include complete setup instructions that work from a fresh clone</constraint>
+    <constraint>Demo video must be 5 minutes maximum (Gauntlet requirement)</constraint>
+    <constraint>Demo video must demonstrate all key differentiators: context modes, Socratic method, scaffolding, student agency, gamification</constraint>
+    <constraint>Deployment must use Vercel (Next.js optimized, one-command deployment)</constraint>
+    <constraint>Deployed app must have no broken links or console errors</constraint>
+    <constraint>Environment variables (OPENAI_API_KEY) must be properly configured in deployment platform</constraint>
+    <constraint>Documentation should reference test-results.md as evidence of quality and readiness</constraint>
+    <constraint>prompts.md must document all 3 mode-specific system prompts and worked example scaffolding logic</constraint>
+  </constraints>
+
+  <interfaces>
+    <interface>
+      <name>POST /api/chat</name>
+      <kind>REST endpoint</kind>
+      <signature>Request: { messages: Message[], mode: 'homework' | 'exam' | 'exploration', confused: boolean } Response: Stream&lt;string&gt;</signature>
+      <path>app/api/chat/route.ts</path>
+    </interface>
+    <interface>
+      <name>POST /api/ocr</name>
+      <kind>REST endpoint</kind>
+      <signature>Request: { image: string (base64) } Response: { problem: string, confidence: number }</signature>
+      <path>app/api/ocr/route.ts</path>
+    </interface>
+  </interfaces>
+
+  <tests>
+    <standards>Manual validation only per ADR-004. Testing approach: Manual validation of deployed application, test all features on production URL, verify no broken links or console errors, validate performance (load time, LLM response), check mobile responsiveness. Documentation validation: setup instructions tested step-by-step, all code examples verified, screenshots accurate and helpful, links functional. Demo video validation: playback quality check, audio clarity, visual clarity, length ≤ 5 minutes, all required features demonstrated.</standards>
+    <locations>No automated tests. Manual validation documented in docs/test-results.md and validation guide after story completion.</locations>
+    <ideas>
+      <idea ac="1">Test README setup instructions by following step-by-step from a fresh clone (verify all commands work)</idea>
+      <idea ac="1">Validate all code examples in README are syntactically correct and match actual implementation</idea>
+      <idea ac="1">Verify all internal links in README point to valid sections/files</idea>
+      <idea ac="2">Cross-reference prompts.md system prompts with actual implementation in app/api/chat/route.ts</idea>
+      <idea ac="2">Validate that documented scaffolding logic matches actual confused button behavior</idea>
+      <idea ac="3">Test demo video playback on multiple devices (desktop, mobile, tablet if possible)</idea>
+      <idea ac="3">Verify all 3 modes are visibly demonstrated in demo video</idea>
+      <idea ac="3">Confirm demo video length is ≤ 5 minutes</idea>
+      <idea ac="4">Test deployed URL is publicly accessible (try from incognito/different browser)</idea>
+      <idea ac="4">Validate no console errors on deployed version (check browser DevTools)</idea>
+      <idea ac="4">Test all features work on deployed version: mode selection, chat, confused button, math rendering</idea>
+      <idea ac="4">Verify performance on deployed version: LLM response time &lt; 3s, page load &lt; 2s</idea>
+    </ideas>
+  </tests>
+</story-context>
