@@ -1,6 +1,6 @@
 # Story 4.2: Problems Solved Counter
 
-Status: in-progress
+Status: review
 
 ## Story
 
