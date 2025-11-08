@@ -218,12 +218,13 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Return streaming response with struggle state in custom header
+    // Return streaming response with struggle state and problem solved headers
     return new Response(readableStream, {
       headers: {
         'Content-Type': 'text/plain; charset=utf-8',
         'Transfer-Encoding': 'chunked',
         'X-Struggle-State': isStruggling.toString(), // Custom header for struggle detection
+        'X-Problem-Solved': answerValidation?.isCorrect === true ? 'true' : 'false', // Story 4.1: Signal correct answer
       },
     });
   } catch (error: any) {

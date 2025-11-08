@@ -2,11 +2,13 @@
 
 import { useState } from 'react';
 import { useChatStore } from '@/store/chat';
+import { useGamificationStore } from '@/store/gamification';
 import { ImageUpload } from './ImageUpload';
 
 export default function MessageInput() {
   const [input, setInput] = useState('');
   const { addMessage, isLoading, setLoading, sessionMode, setStruggleState } = useChatStore();
+  const incrementStreak = useGamificationStore((state) => state.incrementStreak);
 
   // Handle extracted text from image upload
   const handleImageExtract = (text: string) => {
@@ -50,9 +52,11 @@ export default function MessageInput() {
         throw new Error(`API error: ${response.status}`);
       }
 
-      // Read struggle state from response header
+      // Read struggle state and problem solved from response headers
       const struggleState = response.headers.get('X-Struggle-State');
       const isStruggling = struggleState === 'true';
+      const problemSolved = response.headers.get('X-Problem-Solved');
+      const wasProblemSolved = problemSolved === 'true';
 
       // Handle streaming response
       const reader = response.body?.getReader();
@@ -93,6 +97,17 @@ export default function MessageInput() {
 
       // Update struggle state in store after response is complete
       setStruggleState(isStruggling);
+
+      // Story 4.1: Increment streak if student solved problem correctly
+      if (wasProblemSolved) {
+        const milestone = incrementStreak();
+
+        if (milestone.reached && milestone.message) {
+          // Log milestone celebration (Story 4.3 will add visual celebration)
+          console.log('[Streak Milestone]', milestone.message);
+          // TODO Story 4.3: Trigger celebration animation here
+        }
+      }
 
       setLoading(false);
     } catch (error) {
