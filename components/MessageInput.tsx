@@ -4,12 +4,19 @@ import { useState } from 'react';
 import { useChatStore } from '@/store/chat';
 import { useGamificationStore } from '@/store/gamification';
 import { ImageUpload } from './ImageUpload';
+import { CelebrationToast } from './CelebrationToast';
+import { triggerConfetti, getCelebrationMessage, formatCelebrationMessage } from '@/lib/celebration';
 
 export default function MessageInput() {
   const [input, setInput] = useState('');
   const { addMessage, isLoading, setLoading, sessionMode, setStruggleState } = useChatStore();
   const incrementStreak = useGamificationStore((state) => state.incrementStreak);
   const incrementProblemCount = useGamificationStore((state) => state.incrementProblemCount);
+  const currentStreak = useGamificationStore((state) => state.streakData.currentStreak);
+  const totalProblems = useGamificationStore((state) => state.totalProblems);
+
+  // Celebration state
+  const [celebrationMessage, setCelebrationMessage] = useState<string | null>(null);
 
   // Handle extracted text from image upload
   const handleImageExtract = (text: string) => {
@@ -99,26 +106,32 @@ export default function MessageInput() {
       // Update struggle state in store after response is complete
       setStruggleState(isStruggling);
 
-      // Story 4.1 & 4.2: Increment streak and problem count if student solved correctly
+      // Story 4.1, 4.2, 4.3: Celebrate when student solves problem correctly
       if (wasProblemSolved) {
         // Increment streak
         const streakMilestone = incrementStreak();
 
-        if (streakMilestone.reached && streakMilestone.message) {
-          console.log('[Streak Milestone]', streakMilestone.message);
-          // TODO Story 4.3: Trigger celebration animation here
-        }
-
-        // Story 4.2: Increment problem count
-        // Detect solo solve: problem solved without clicking "confused" button
+        // Increment problem count
         const confusedClicked = useChatStore.getState().metadata.confusedClicked;
         const isSoloSolve = !confusedClicked;
-
         const problemMilestone = incrementProblemCount(isSoloSolve);
 
+        // Story 4.3: Trigger celebration with confetti and toast
+        const baseMessage = getCelebrationMessage();
+        const fullMessage = formatCelebrationMessage(baseMessage, currentStreak, totalProblems + 1); // +1 because just incremented
+
+        // Trigger confetti animation
+        triggerConfetti();
+
+        // Show toast message
+        setCelebrationMessage(fullMessage);
+
+        // Log milestones for debugging
+        if (streakMilestone.reached && streakMilestone.message) {
+          console.log('[Streak Milestone]', streakMilestone.message);
+        }
         if (problemMilestone.reached && problemMilestone.message) {
           console.log('[Problem Milestone]', problemMilestone.message);
-          // TODO Story 4.3: Trigger celebration animation here
         }
       }
 
@@ -144,6 +157,14 @@ export default function MessageInput() {
 
   return (
     <div className="p-4 space-y-3">
+      {/* Celebration Toast */}
+      {celebrationMessage && (
+        <CelebrationToast
+          message={celebrationMessage}
+          onComplete={() => setCelebrationMessage(null)}
+        />
+      )}
+
       {/* Image Upload */}
       <ImageUpload onExtract={handleImageExtract} />
 
