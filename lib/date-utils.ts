@@ -43,3 +43,28 @@ export function areConsecutiveDays(earlierDate: string, laterDate: string): bool
     return false;
   }
 }
+
+/**
+ * Get week number for a given date
+ * Returns format: "YYYY-Wnn" (e.g., "2025-W45")
+ * Used for weekly reset logic in problem counters
+ * @param date - The date to get week number for
+ * @returns Week identifier string
+ */
+export function getWeekNumber(date: Date): string {
+  try {
+    const year = date.getFullYear();
+    const startOfYear = new Date(year, 0, 1);
+
+    // Calculate days since start of year
+    const daysSinceYearStart = Math.floor((date.getTime() - startOfYear.getTime()) / (24 * 60 * 60 * 1000));
+
+    // Calculate week number (weeks start on Monday)
+    const weekNum = Math.ceil((daysSinceYearStart + startOfYear.getDay() + 1) / 7);
+
+    return `${year}-W${weekNum}`;
+  } catch (error) {
+    console.error('[date-utils] Error calculating week number:', error);
+    return '';
+  }
+}

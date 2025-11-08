@@ -9,6 +9,7 @@ export default function MessageInput() {
   const [input, setInput] = useState('');
   const { addMessage, isLoading, setLoading, sessionMode, setStruggleState } = useChatStore();
   const incrementStreak = useGamificationStore((state) => state.incrementStreak);
+  const incrementProblemCount = useGamificationStore((state) => state.incrementProblemCount);
 
   // Handle extracted text from image upload
   const handleImageExtract = (text: string) => {
@@ -98,13 +99,25 @@ export default function MessageInput() {
       // Update struggle state in store after response is complete
       setStruggleState(isStruggling);
 
-      // Story 4.1: Increment streak if student solved problem correctly
+      // Story 4.1 & 4.2: Increment streak and problem count if student solved correctly
       if (wasProblemSolved) {
-        const milestone = incrementStreak();
+        // Increment streak
+        const streakMilestone = incrementStreak();
 
-        if (milestone.reached && milestone.message) {
-          // Log milestone celebration (Story 4.3 will add visual celebration)
-          console.log('[Streak Milestone]', milestone.message);
+        if (streakMilestone.reached && streakMilestone.message) {
+          console.log('[Streak Milestone]', streakMilestone.message);
+          // TODO Story 4.3: Trigger celebration animation here
+        }
+
+        // Story 4.2: Increment problem count
+        // Detect solo solve: problem solved without clicking "confused" button
+        const confusedClicked = useChatStore.getState().metadata.confusedClicked;
+        const isSoloSolve = !confusedClicked;
+
+        const problemMilestone = incrementProblemCount(isSoloSolve);
+
+        if (problemMilestone.reached && problemMilestone.message) {
+          console.log('[Problem Milestone]', problemMilestone.message);
           // TODO Story 4.3: Trigger celebration animation here
         }
       }

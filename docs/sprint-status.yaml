@@ -62,7 +62,7 @@ development_status:
   # Epic 4: Gamification & Polish
   epic-4: backlog
   4-1-daily-streak-tracker: review
-  4-2-problems-solved-counter: backlog
+  4-2-problems-solved-counter: in-progress
   4-3-celebration-animations: backlog
   4-4-responsive-design-ux-polish: backlog
   epic-4-retrospective: optional

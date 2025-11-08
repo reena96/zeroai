@@ -8,6 +8,7 @@ import MessageInput from '@/components/MessageInput';
 import ModeSelector from '@/components/ModeSelector';
 import ModeIndicator from '@/components/ModeIndicator';
 import { StreakDisplay } from '@/components/StreakDisplay';
+import { ProblemCounter } from '@/components/ProblemCounter';
 
 export default function ChatContainer() {
   const sessionMode = useChatStore((state) => state.sessionMode);
@@ -54,7 +55,10 @@ export default function ChatContainer() {
           </div>
           <div className="flex flex-col items-end gap-2">
             <ModeIndicator mode={sessionMode} />
-            <StreakDisplay />
+            <div className="flex flex-col items-end gap-2">
+              <StreakDisplay />
+              <ProblemCounter />
+            </div>
           </div>
         </div>
       </div>

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { getTodayDateString, getYesterdayDateString } from '@/lib/date-utils';
+import { getTodayDateString, getYesterdayDateString, getWeekNumber } from '@/lib/date-utils';
 
 /**
  * Streak Data Structure
@@ -33,29 +33,56 @@ interface GamificationStore {
   resetStreak: () => void;
   incrementStreak: () => MilestoneInfo;
 
-  // Problem tracking (for Story 4.2)
+  // Problem tracking (Story 4.2)
   totalProblems: number;
   weeklyProblems: number;
+  soloSolves: number;
   lastResetDate: string;
-  incrementProblemCount: () => void;
+  lastCelebratedProblemMilestone?: number;
+  incrementProblemCount: (isSoloSolve?: boolean) => MilestoneInfo;
 }
 
 /**
  * Milestone thresholds
  */
-const MILESTONES = [7, 14, 30];
+const STREAK_MILESTONES = [7, 14, 30];
+const PROBLEM_MILESTONES = [10, 25, 50, 100];
 
 /**
  * Check if current streak matches a milestone and hasn't been celebrated yet
  */
-function checkMilestone(currentStreak: number, lastCelebrated?: number): MilestoneInfo {
-  const milestone = MILESTONES.find((m) => m === currentStreak);
+function checkStreakMilestone(currentStreak: number, lastCelebrated?: number): MilestoneInfo {
+  const milestone = STREAK_MILESTONES.find((m) => m === currentStreak);
 
   if (milestone && milestone !== lastCelebrated) {
     const messages: Record<number, string> = {
       7: '7 day streak - You\'re on fire! 🎉',
       14: '14 day streak - Incredible dedication! 🔥',
       30: '30 day streak - You\'re unstoppable! 🏆',
+    };
+
+    return {
+      reached: true,
+      milestone,
+      message: messages[milestone],
+    };
+  }
+
+  return { reached: false };
+}
+
+/**
+ * Check if current problem count matches a milestone and hasn't been celebrated yet
+ */
+function checkProblemMilestone(totalProblems: number, lastCelebrated?: number): MilestoneInfo {
+  const milestone = PROBLEM_MILESTONES.find((m) => m === totalProblems);
+
+  if (milestone && milestone !== lastCelebrated) {
+    const messages: Record<number, string> = {
+      10: '10 problems solved - Great start! 🎉',
+      25: '25 problems - You\'re building momentum! 💪',
+      50: '50 problems - Halfway to mastery! 🌟',
+      100: '100 problems - You\'re unstoppable! 🏆',
     };
 
     return {
@@ -83,7 +110,9 @@ export const useGamificationStore = create<GamificationStore>()(
       // Problem tracking (Story 4.2)
       totalProblems: 0,
       weeklyProblems: 0,
-      lastResetDate: getTodayDateString(),
+      soloSolves: 0,
+      lastResetDate: getWeekNumber(new Date()),
+      lastCelebratedProblemMilestone: undefined,
 
       /**
        * Check and update streak based on last used date
@@ -109,7 +138,7 @@ export const useGamificationStore = create<GamificationStore>()(
           // Consecutive day - increment streak
           if (streakData.lastUsedDate === yesterday) {
             const newStreak = streakData.currentStreak + 1;
-            const milestone = checkMilestone(newStreak, streakData.lastCelebratedMilestone);
+            const milestone = checkStreakMilestone(newStreak, streakData.lastCelebratedMilestone);
 
             set({
               streakData: {
@@ -169,20 +198,48 @@ export const useGamificationStore = create<GamificationStore>()(
 
       /**
        * Increment problem count (Story 4.2)
+       * @param isSoloSolve - Whether this problem was solved without using the confused button
+       * @returns MilestoneInfo if a problem milestone was reached
        */
-      incrementProblemCount: () => {
-        const { totalProblems, weeklyProblems, lastResetDate } = get();
-        const today = getTodayDateString();
+      incrementProblemCount: (isSoloSolve = false) => {
+        const { totalProblems, weeklyProblems, soloSolves, lastResetDate, lastCelebratedProblemMilestone } = get();
 
-        // Check if we need to reset weekly counter (simple approach for MVP)
-        // In production, would use proper week calculation
-        const needsReset = lastResetDate !== today;
+        try {
+          // Get current week number
+          const currentWeek = getWeekNumber(new Date());
 
-        set({
-          totalProblems: totalProblems + 1,
-          weeklyProblems: needsReset ? 1 : weeklyProblems + 1,
-          lastResetDate: today,
-        });
+          // Check if we need to reset weekly counter (different week)
+          const needsWeeklyReset = lastResetDate !== currentWeek;
+
+          // Calculate new values
+          const newTotalProblems = totalProblems + 1;
+          const newWeeklyProblems = needsWeeklyReset ? 1 : weeklyProblems + 1;
+          const newSoloSolves = isSoloSolve ? soloSolves + 1 : soloSolves;
+
+          // Check for milestone
+          const milestone = checkProblemMilestone(newTotalProblems, lastCelebratedProblemMilestone);
+
+          // Update store
+          set({
+            totalProblems: newTotalProblems,
+            weeklyProblems: newWeeklyProblems,
+            soloSolves: newSoloSolves,
+            lastResetDate: currentWeek,
+            lastCelebratedProblemMilestone: milestone.reached
+              ? milestone.milestone
+              : lastCelebratedProblemMilestone,
+          });
+
+          return milestone;
+        } catch (error) {
+          console.error('[gamification] Error incrementing problem count:', error);
+          // On error, still increment but skip milestone check
+          set({
+            totalProblems: totalProblems + 1,
+            weeklyProblems: weeklyProblems + 1,
+          });
+          return { reached: false };
+        }
       },
     }),
     {
