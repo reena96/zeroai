@@ -68,7 +68,7 @@ development_status:
   epic-4-retrospective: optional
 
   # Epic 5: Testing, Documentation & Deployment
-  epic-5: backlog
+  epic-5: done
   5-1-cross-problem-type-testing-validation: done
   5-2-documentation-demo-video-deployment: done
   epic-5-retrospective: optional
