@@ -1,0 +1,161 @@
+<story-context id="bmad/bmm/workflows/4-implementation/story-context/template" v="1.0">
+  <metadata>
+    <epicId>4</epicId>
+    <storyId>4.1</storyId>
+    <title>Daily Streak Tracker</title>
+    <status>drafted</status>
+    <generatedAt>2025-11-07</generatedAt>
+    <generator>BMAD Story Context Workflow</generator>
+    <sourceStoryPath>docs/stories/4-1-daily-streak-tracker.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>a student</asA>
+    <iWant>to see my daily streak of using the tutor</iWant>
+    <soThat>I'm motivated to practice every day</soThat>
+    <tasks>
+      - Task 1: Create gamification Zustand store with localStorage persistence (AC: #1, #6)
+      - Task 2: Implement streak update logic with timezone awareness (AC: #3, #4, #7)
+      - Task 3: Create StreakDisplay component (AC: #2)
+      - Task 4: Integrate streak tracking into app workflow (AC: #8)
+      - Task 5: Implement milestone celebrations (AC: #5)
+      - Task 6: Testing and edge cases (All ACs)
+    </tasks>
+  </story>
+
+  <acceptanceCriteria>
+    1. Streak counter stored in localStorage with structure: {lastUsedDate, currentStreak}
+    2. Display prominently in header/top of UI: "🔥 5 day streak!"
+    3. Streak increments when student uses app on new calendar day (compared to lastUsedDate)
+    4. Streak resets to 1 if student misses a day (>24h gap between lastUsedDate and today)
+    5. Milestone celebrations at 7, 14, 30 days: "7 day streak - You're on fire! 🎉"
+    6. Streak data persists across browser sessions via localStorage
+    7. Timezone-aware: Comparisons use local timezone, reset at midnight local time
+    8. First-time users start at "1 day streak" after solving their first problem
+  </acceptanceCriteria>
+
+  <artifacts>
+    <docs>
+      <doc>
+        <path>docs/epics/epic-4-gamification-polish.md</path>
+        <title>Epic 4: Gamification & Polish</title>
+        <section>Story 4.1: Daily Streak Tracker</section>
+        <snippet>As a student, I want to see my daily streak of using the tutor, so that I'm motivated to practice every day. Streak counter stored in localStorage: {lastUsedDate, currentStreak}. Display prominently in header: "🔥 5 day streak!"</snippet>
+      </doc>
+      <doc>
+        <path>docs/PRD.md</path>
+        <title>zeroai - Product Requirements Document</title>
+        <section>FR-7: Gamification System (Engagement Driver)</section>
+        <snippet>Daily streak tracker persisted in localStorage for MVP. Display prominently: "🔥 5 day streak!" Celebrate milestones: "7 day streak - You're on fire! 🎉"</snippet>
+      </doc>
+      <doc>
+        <path>docs/architecture.md</path>
+        <title>zeroai - Architecture Document</title>
+        <section>State Management - Zustand with Persist Middleware</section>
+        <snippet>Zustand for state management with localStorage persistence middleware. Client-side date/time using Browser API for timezone awareness. File location: store/gamification.ts, components/StreakDisplay.tsx</snippet>
+      </doc>
+    </docs>
+    <code>
+      <artifact>
+        <path>store/chat.ts</path>
+        <kind>store</kind>
+        <symbol>useChatStore</symbol>
+        <lines>40-211</lines>
+        <reason>Existing Zustand store pattern to follow - uses create() from zustand, demonstrates state management pattern, action methods, and fine-grained subscriptions</reason>
+      </artifact>
+      <artifact>
+        <path>components/Message.tsx</path>
+        <kind>component</kind>
+        <symbol>Message</symbol>
+        <lines>1-50</lines>
+        <reason>Example of client component pattern with 'use client' directive - pattern to follow for StreakDisplay.tsx</reason>
+      </artifact>
+      <artifact>
+        <path>components/MathText.tsx</path>
+        <kind>component</kind>
+        <symbol>MathText</symbol>
+        <lines>1-116</lines>
+        <reason>Recent Story 3.3 component showing error handling pattern (try-catch with graceful fallback) and mobile responsive design - apply similar patterns</reason>
+      </artifact>
+      <artifact>
+        <path>app/page.tsx</path>
+        <kind>page</kind>
+        <symbol>HomePage</symbol>
+        <lines>1-100</lines>
+        <reason>Main page component where StreakDisplay will be integrated in header area - needs modification to add StreakDisplay and initialize streak check on mount</reason>
+      </artifact>
+    </code>
+    <dependencies>
+      <node>
+        <zustand>^5.0.8</zustand>
+        <nanoid>^5.1.6</nanoid>
+        <react>^18.3.0</react>
+        <next>^15.0.0</next>
+        <typescript>^5</typescript>
+      </node>
+    </dependencies>
+  </artifacts>
+
+  <constraints>
+    - Use Zustand create() with persist middleware for state management (follow pattern from store/chat.ts)
+    - localStorage key must be 'zeroai-gamification' for namespace consistency
+    - Client-side date handling using new Date().toLocaleDateString() for timezone awareness
+    - Component must use 'use client' directive (client-side only, uses hooks)
+    - Follow mobile-responsive design patterns from MathText.tsx (Tailwind classes, overflow handling)
+    - Error handling: wrap localStorage access and date parsing in try-catch blocks
+    - On error: initialize to default state (currentStreak = 0), no console spam
+    - Streak updates only when student solves a problem (requires engagement, not just app open)
+    - No new package installations required (Zustand already installed)
+    - Test manually per ADR-004 (no automated tests for MVP)
+  </constraints>
+
+  <interfaces>
+    <interface>
+      <name>StreakData</name>
+      <kind>TypeScript interface</kind>
+      <signature>interface StreakData { lastUsedDate: string; currentStreak: number; lastCelebratedMilestone?: number; }</signature>
+      <path>store/gamification.ts</path>
+    </interface>
+    <interface>
+      <name>GamificationStore</name>
+      <kind>Zustand store interface</kind>
+      <signature>interface GamificationStore { streakData: StreakData; checkAndUpdateStreak: () => { updated: boolean; milestone?: number }; resetStreak: () => void; }</signature>
+      <path>store/gamification.ts</path>
+    </interface>
+    <interface>
+      <name>getTodayDateString</name>
+      <kind>Date utility function</kind>
+      <signature>function getTodayDateString(): string // Returns local date string like "11/7/2025"</signature>
+      <path>lib/date-utils.ts</path>
+    </interface>
+    <interface>
+      <name>getYesterdayDateString</name>
+      <kind>Date utility function</kind>
+      <signature>function getYesterdayDateString(): string // Returns yesterday's local date string</signature>
+      <path>lib/date-utils.ts</path>
+    </interface>
+  </interfaces>
+
+  <tests>
+    <standards>
+      Manual testing only per ADR-004 (Manual Testing Only). No automated tests for 5-day MVP timeline. Test with documented test cases covering first-time user flow, same-day usage, consecutive days, missed days, milestone celebrations, localStorage persistence, and timezone edge cases.
+    </standards>
+    <locations>
+      N/A - Manual testing only. Document test cases in validation guide.
+    </locations>
+    <ideas>
+      - AC #1, #6: Test localStorage persistence - set streak, close browser, reopen, verify streak persists
+      - AC #2: Test display formatting - verify "1 day" (singular) vs "5 days" (plural), emoji shows, prominently placed
+      - AC #3: Test same-day usage - solve multiple problems same day, streak doesn't double-increment
+      - AC #3: Test consecutive days - Day 1 solve → streak=1, Day 2 solve → streak=2, Day 3 solve → streak=3
+      - AC #4: Test missed day reset - Day 1 streak=3, skip Day 2, Day 3 solve → streak=1 (reset)
+      - AC #5: Test milestone celebrations - reach 7 days → toast shows "7 day streak - You're on fire! 🎉", no repeat on day 7
+      - AC #5: Test milestone celebrations - reach 14 and 30 days → new celebrations trigger
+      - AC #7: Test timezone awareness - use DevTools to simulate midnight transition, verify streak increments correctly
+      - AC #8: Test first-time user - no localStorage → streak=0 (hidden), solve first problem → streak=1 (shows)
+      - Edge case: Test with localStorage disabled - graceful degradation (no errors)
+      - Edge case: Test with corrupted localStorage data - reset to default
+      - Edge case: Test very long streaks (100+ days) - UI displays correctly
+    </ideas>
+  </tests>
+</story-context>

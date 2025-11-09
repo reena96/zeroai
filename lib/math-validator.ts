@@ -314,9 +314,92 @@ export function validateStudentAnswer(
   // Pattern 1: Just a number (e.g., "5", "2", "-3", "0.5")
   const numberMatch = trimmed.match(/^-?\d+(\.\d+)?$/);
   if (numberMatch) {
+    const studentAnswer = parseFloat(trimmed);
+
+    // Debug: log conversation context to see what we're working with
+    console.log('[Answer Validation] Student answered:', trimmed);
+    console.log('[Answer Validation] Conversation context:', conversationContext.substring(conversationContext.length - 200));
+
+    // Try to extract math expressions from LaTeX format: $expression$
+    // This is how the tutor presents problems
+    const latexPattern = /\$([0-9+\-*/().\s]+)\$/g;
+    const latexMatches = [...conversationContext.matchAll(latexPattern)];
+
+    console.log('[Answer Validation] Found', latexMatches.length, 'LaTeX expressions');
+
+    // Try each LaTeX expression and see if any evaluate to the student's answer
+    for (const match of latexMatches) {
+      try {
+        const expression = match[1].trim();
+        console.log('[Answer Validation] Testing expression:', expression);
+
+        const validation = validateWithMathJS(expression);
+        if (validation.isValid && validation.result !== undefined) {
+          const expectedAnswer = parseFloat(validation.result);
+          const isCorrect = Math.abs(studentAnswer - expectedAnswer) < 0.001;
+
+          console.log('[Answer Validation] Expression', expression, 'evaluates to', expectedAnswer, '- student answered', studentAnswer, '- match:', isCorrect);
+
+          if (isCorrect) {
+            return {
+              hasAnswer: true,
+              isCorrect: true,
+              studentAnswer: trimmed,
+              expectedAnswer: validation.result,
+              validationNote: `[VALIDATION: Student answered ${trimmed} - CORRECT]`,
+            };
+          }
+        }
+      } catch (error) {
+        // Skip invalid expressions
+      }
+    }
+
+    // If no LaTeX match found or validated, try plain text pattern
+    const mathQuestionPattern = /(?:what\s+is|solve|calculate|find)\s+([0-9+\-*/().\s]+?)(?:\?|$|\.|\n)/i;
+    const questionMatch = conversationContext.match(mathQuestionPattern);
+
+    console.log('[Answer Validation] Plain text question match:', questionMatch ? questionMatch[1] : 'none');
+
+    if (questionMatch) {
+      try {
+        const expression = questionMatch[1].trim();
+        const validation = validateWithMathJS(expression);
+
+        if (validation.isValid && validation.result !== undefined) {
+          const expectedAnswer = parseFloat(validation.result);
+          const isCorrect = Math.abs(studentAnswer - expectedAnswer) < 0.001; // Handle floating point
+
+          return {
+            hasAnswer: true,
+            isCorrect: isCorrect,
+            studentAnswer: trimmed,
+            expectedAnswer: validation.result,
+            validationNote: isCorrect
+              ? `[VALIDATION: Student answered ${trimmed} - CORRECT]`
+              : `[VALIDATION: Student answered ${trimmed} - INCORRECT. Expected ${validation.result}. Check calculation before affirming.]`,
+          };
+        }
+      } catch (error) {
+        // Couldn't parse/validate - let LLM handle it
+      }
+    }
+
+    // Fallback: Found a numeric answer but couldn't validate it
+    // Return false if we found LaTeX expressions but none matched
+    if (latexMatches.length > 0) {
+      return {
+        hasAnswer: true,
+        isCorrect: false,
+        studentAnswer: trimmed,
+        validationNote: `[VALIDATION: Student answered ${trimmed} - INCORRECT. Check calculation before affirming.]`,
+      };
+    }
+
+    // No expressions found - can't validate without clear question context
     return {
       hasAnswer: true,
-      isCorrect: null, // Need context to validate
+      isCorrect: null,
       studentAnswer: trimmed,
       validationNote: `Student answered: ${trimmed}`,
     };
@@ -326,47 +409,62 @@ export function validateStudentAnswer(
   const varMatch = trimmed.match(/^([a-z])\s*=\s*(-?\d+(\.\d+)?)$/i);
   if (varMatch) {
     const variable = varMatch[1];
-    const value = varMatch[2];
+    const value = parseFloat(varMatch[2]);
 
-    // Try to validate by checking if substitution works
-    // Look in conversation for equations containing this variable
-    const equationPattern = new RegExp(`([^=]+${variable}[^=]*=\\s*\\d+)`, 'i');
-    const eqMatch = conversationContext.match(equationPattern);
+    console.log('[Answer Validation] Variable assignment:', variable, '=', value);
 
-    if (eqMatch) {
+    // Try to extract equations from LaTeX format: $x + 5 = 8$
+    const latexEquationPattern = new RegExp(`\\$([^$]*${variable}[^$]*=[^$]*)\\$`, 'gi');
+    const latexMatches = [...conversationContext.matchAll(latexEquationPattern)];
+
+    console.log('[Answer Validation] Found', latexMatches.length, 'LaTeX equations with variable', variable);
+
+    // Try each equation and see if substitution makes it valid
+    for (const match of latexMatches) {
       try {
-        // Extract equation like "2x + y = 8"
-        const equation = eqMatch[1];
-        // Substitute student's value and check
-        const substituted = equation.replace(new RegExp(variable, 'gi'), value);
-        const validation = validateWithMathJS(substituted);
+        const equation = match[1].trim();
+        console.log('[Answer Validation] Testing equation:', equation);
 
-        if (validation.result === 'true') {
-          return {
-            hasAnswer: true,
-            isCorrect: true,
-            studentAnswer: `${variable} = ${value}`,
-            validationNote: `[VALIDATION: Student answered ${variable} = ${value} - CORRECT]`,
-          };
-        } else {
-          return {
-            hasAnswer: true,
-            isCorrect: false,
-            studentAnswer: `${variable} = ${value}`,
-            validationNote: `[VALIDATION: Student answered ${variable} = ${value} - INCORRECT. Check calculation before affirming.]`,
-          };
+        // Check if this is a simple equation (not a system or complex expression)
+        if (!equation.includes('$') && equation.split('=').length === 2) {
+          // Handle implicit multiplication (e.g., 2x -> 2*x before substitution)
+          let processedEquation = equation.replace(/(\d)([a-zA-Z])/g, '$1*$2');
+
+          // Substitute student's value
+          const substituted = processedEquation.replace(new RegExp(variable, 'gi'), value.toString());
+          console.log('[Answer Validation] After substitution:', substituted);
+
+          const validation = validateWithMathJS(substituted);
+
+          if (validation.result === 'true') {
+            console.log('[Answer Validation] ✅ Validation passed for', variable, '=', value);
+            return {
+              hasAnswer: true,
+              isCorrect: true,
+              studentAnswer: `${variable} = ${value}`,
+              expectedAnswer: value.toString(),
+              validationNote: `[VALIDATION: Student answered ${variable} = ${value} - CORRECT]`,
+            };
+          } else if (validation.result === 'false') {
+            console.log('[Answer Validation] ❌ Answer is incorrect:', validation);
+            return {
+              hasAnswer: true,
+              isCorrect: false,
+              studentAnswer: `${variable} = ${value}`,
+              validationNote: `[VALIDATION: Student answered ${variable} = ${value} - INCORRECT. Check calculation before affirming.]`,
+            };
+          } else {
+            console.log('[Answer Validation] ⚠️ Validation inconclusive:', validation);
+          }
         }
       } catch (error) {
-        // Couldn't validate - let LLM handle it
-        return {
-          hasAnswer: true,
-          isCorrect: null,
-          studentAnswer: `${variable} = ${value}`,
-          validationNote: `Student answered: ${variable} = ${value}`,
-        };
+        console.log('[Answer Validation] Error validating equation:', error);
+        // Continue to next equation
       }
     }
 
+    // Fallback: couldn't validate with LaTeX equations, let LLM handle it
+    console.log('[Answer Validation] Could not validate variable assignment, deferring to LLM');
     return {
       hasAnswer: true,
       isCorrect: null,

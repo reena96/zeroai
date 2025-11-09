@@ -2,15 +2,25 @@
 
 import { useEffect, useState } from 'react';
 import { useChatStore } from '@/store/chat';
+import { useGamificationStore } from '@/store/gamification';
 import MessageList from '@/components/MessageList';
 import MessageInput from '@/components/MessageInput';
 import ModeSelector from '@/components/ModeSelector';
 import ModeIndicator from '@/components/ModeIndicator';
+import { StreakDisplay } from '@/components/StreakDisplay';
+import { ProblemCounter } from '@/components/ProblemCounter';
 
 export default function ChatContainer() {
   const sessionMode = useChatStore((state) => state.sessionMode);
   const setSessionMode = useChatStore((state) => state.setSessionMode);
+  const checkAndUpdateStreak = useGamificationStore((state) => state.checkAndUpdateStreak);
   const [showDefaultMessage, setShowDefaultMessage] = useState(false);
+
+  // Initialize streak check on mount
+  useEffect(() => {
+    // Check and update streak when app loads (Story 4.1)
+    checkAndUpdateStreak();
+  }, [checkAndUpdateStreak]);
 
   // Auto-select "Homework Help" after 10 seconds if no mode is selected
   useEffect(() => {
@@ -33,17 +43,25 @@ export default function ChatContainer() {
 
   // Otherwise show the chat interface
   return (
-    <div className="flex flex-col h-screen max-w-4xl mx-auto bg-white">
-      {/* Header with Mode Indicator */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-4 shadow-md">
-        <div className="flex items-center justify-between">
+    <div className="flex flex-col h-screen max-w-5xl mx-auto bg-gradient-to-br from-slate-50 to-slate-100">
+      {/* Header with Mode Indicator and Stats */}
+      <div className="bg-gradient-to-r from-cyan-600 via-teal-600 to-cyan-600 text-white p-6 shadow-lg">
+        <div className="flex items-start justify-between mb-4">
           <div>
-            <h1 className="text-2xl font-bold">ZeroAI Math Tutor</h1>
-            <p className="text-sm text-blue-100">
+            <h1 className="text-3xl font-bold">
+              ZeroAI Math Tutor
+            </h1>
+            <p className="text-sm text-cyan-100 font-medium mt-1">
               Your Socratic learning companion
             </p>
           </div>
           <ModeIndicator mode={sessionMode} />
+        </div>
+
+        {/* Stats Row */}
+        <div className="flex items-center gap-3 flex-wrap">
+          <StreakDisplay />
+          <ProblemCounter />
         </div>
       </div>
 
