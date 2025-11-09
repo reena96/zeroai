@@ -60,11 +60,11 @@ development_status:
   epic-3-retrospective: optional
 
   # Epic 4: Gamification & Polish
-  epic-4: backlog
-  4-1-daily-streak-tracker: backlog
-  4-2-problems-solved-counter: backlog
-  4-3-celebration-animations: backlog
-  4-4-responsive-design-ux-polish: backlog
+  epic-4: done
+  4-1-daily-streak-tracker: done
+  4-2-problems-solved-counter: done
+  4-3-celebration-animations: done
+  4-4-responsive-design-ux-polish: done
   epic-4-retrospective: optional
 
   # Epic 5: Testing, Documentation & Deployment

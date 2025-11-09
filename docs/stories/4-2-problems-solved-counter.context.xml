@@ -1,0 +1,209 @@
+<story-context id="bmad/bmm/workflows/4-implementation/story-context/template" v="1.0">
+  <metadata>
+    <epicId>4</epicId>
+    <storyId>2</storyId>
+    <title>Problems Solved Counter</title>
+    <status>drafted</status>
+    <generatedAt>2025-11-07</generatedAt>
+    <generator>BMAD Story Context Workflow</generator>
+    <sourceStoryPath>docs/stories/4-2-problems-solved-counter.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>a student</asA>
+    <iWant>to see how many problems I've solved</iWant>
+    <soThat>I can track my progress and feel accomplished</soThat>
+    <tasks>
+- Task 1: Enhance gamification store with weekly reset logic (AC: #1, #3, #4)
+  - Subtask 1.1: Add weekly reset detection in incrementProblemCount()
+  - Subtask 1.2: Calculate if current date is a different week than lastResetDate
+  - Subtask 1.3: Reset weeklyProblems to 0 when new week starts (Monday 00:00 local time)
+  - Subtask 1.4: Never reset totalProblems (lifetime counter)
+
+- Task 2: Create ProblemCounter display component (AC: #2, #7)
+  - Subtask 2.1: Create `components/ProblemCounter.tsx`
+  - Subtask 2.2: Subscribe to totalProblems and weeklyProblems from gamification store
+  - Subtask 2.3: Display format: "23 problems this week! 💪"
+  - Subtask 2.4: Show expanded view: "3 today, 23 this week, 156 total" (optional detailed view)
+
+- Task 3: Integrate problem counting into workflow (AC: #5)
+  - Subtask 3.1: Call incrementProblemCount() when X-Problem-Solved header is true
+  - Subtask 3.2: Ensure counting happens in MessageInput.tsx alongside streak increment
+  - Subtask 3.3: Verify problem is counted only once per correct answer
+
+- Task 4: Track solo solves (AC: #6)
+  - Subtask 4.1: Add soloSolves counter to gamification store
+  - Subtask 4.2: Detect if student used "confused" button during conversation
+  - Subtask 4.3: Check confusedClicked metadata from chat store
+  - Subtask 4.4: Increment soloSolves only if confusedClicked === false
+
+- Task 5: Implement milestone encouragement messages (AC: #8)
+  - Subtask 5.1: Add milestone detection for 10, 25, 50, 100 problems
+  - Subtask 5.2: Return milestone info when totalProblems reaches threshold
+  - Subtask 5.3: Track lastCelebratedProblemMilestone to avoid repeat messages
+  - Subtask 5.4: Log encouragement message to console (Story 4.3 will add visual toast)
+
+- Task 6: Testing and edge cases (All ACs)
+  - Subtask 6.1: Test first problem solve (counters initialize correctly)
+  - Subtask 6.2: Test weekly reset (Monday 00:00 transition)
+  - Subtask 6.3: Test total counter persistence (never resets)
+  - Subtask 6.4: Test solo solve detection (confused button interaction)
+  - Subtask 6.5: Test milestone messages (10, 25, 50, 100 problems)
+    </tasks>
+  </story>
+
+  <acceptanceCriteria>
+1. Counter stored in localStorage: `{totalProblems, weeklyProblems, lastResetDate}`
+2. Display in header or sidebar: "23 problems this week! 💪"
+3. Weekly counter resets every Monday at 00:00 local time
+4. Total counter never resets (lifetime progress)
+5. Problem counted as "solved" when student reaches correct answer after Socratic guidance
+6. Separate indicator for "solo solves" (no hints/worked examples needed)
+7. Visual progress: "You've solved 3 problems today, 23 this week, 156 total!"
+8. Encouragement messages at milestones: 10, 25, 50, 100 problems
+  </acceptanceCriteria>
+
+  <artifacts>
+    <docs>
+      <doc>
+        <path>docs/epics/epic-4-gamification-polish.md</path>
+        <title>Epic 4: Gamification & Polish</title>
+        <section>Story 4.2: Problems Solved Counter</section>
+        <snippet>Counter stored in localStorage: {totalProblems, weeklyProblems, lastResetDate}. Weekly counter resets every Monday at 00:00 local time. Total counter never resets. Solo solve tracking when no "confused" button clicked.</snippet>
+      </doc>
+      <doc>
+        <path>docs/PRD.md</path>
+        <title>Product Requirements Document</title>
+        <section>FR-7.2: Problems Solved Counter</section>
+        <snippet>Track problems solved with weekly/total counters. Separate counter for "solo solves" (no hints needed). Milestone celebrations at 10, 25, 50, 100 problems.</snippet>
+      </doc>
+      <doc>
+        <path>docs/architecture.md</path>
+        <title>Architecture Document</title>
+        <section>State Management - Zustand with Persist</section>
+        <snippet>Zustand persist middleware for gamification with localStorage key: 'zeroai-gamification'. Date utilities in lib/date-utils.ts for streak/counter calculations.</snippet>
+      </doc>
+      <doc>
+        <path>docs/stories/4-1-daily-streak-tracker.md</path>
+        <title>Story 4.1: Daily Streak Tracker</title>
+        <section>Dev Notes - Infrastructure Established</section>
+        <snippet>store/gamification.ts exists with problem counter stub. incrementProblemCount() already defined. localStorage persistence working via Zustand persist middleware. Problem-solved detection via X-Problem-Solved header functional.</snippet>
+      </doc>
+    </docs>
+    <code>
+      <artifact>
+        <path>store/gamification.ts</path>
+        <kind>zustand-store</kind>
+        <symbol>useGamificationStore</symbol>
+        <lines>1-193</lines>
+        <reason>Existing gamification store with problem counter stub (lines 173-186). Story 4.2 enhances incrementProblemCount() with weekly reset logic, solo solve tracking, and milestone detection.</reason>
+      </artifact>
+      <artifact>
+        <path>store/gamification.ts</path>
+        <kind>interface</kind>
+        <symbol>MilestoneInfo</symbol>
+        <lines>18-22</lines>
+        <reason>Reuse this pattern for problem milestone returns. Already used for streak milestones in Story 4.1.</reason>
+      </artifact>
+      <artifact>
+        <path>store/chat.ts</path>
+        <kind>interface</kind>
+        <symbol>ConversationMetadata</symbol>
+        <lines>16-23</lines>
+        <reason>Contains confusedClicked flag needed for solo solve detection (AC #6). Access via useChatStore.getState().metadata.confusedClicked.</reason>
+      </artifact>
+      <artifact>
+        <path>lib/date-utils.ts</path>
+        <kind>utility</kind>
+        <symbol>getTodayDateString</symbol>
+        <lines>1-3</lines>
+        <reason>Reuse for date comparisons. Story 4.2 needs new getWeekNumber() function for weekly reset logic.</reason>
+      </artifact>
+      <artifact>
+        <path>components/MessageInput.tsx</path>
+        <kind>component</kind>
+        <symbol>MessageInput</symbol>
+        <lines>101-110</lines>
+        <reason>Already reads X-Problem-Solved header and increments streak. Story 4.2 adds incrementProblemCount() call here, passing confusedClicked for solo solve detection.</reason>
+      </artifact>
+      <artifact>
+        <path>components/ChatContainer.tsx</path>
+        <kind>component</kind>
+        <symbol>ChatContainer</symbol>
+        <lines>header-section</lines>
+        <reason>Already displays StreakDisplay. Story 4.2 adds ProblemCounter component to header.</reason>
+      </artifact>
+      <artifact>
+        <path>app/api/chat/route.ts</path>
+        <kind>api-route</kind>
+        <symbol>POST</symbol>
+        <lines>227</lines>
+        <reason>Sets X-Problem-Solved header when answerValidation.isCorrect === true. Already functional from Story 4.1.</reason>
+      </artifact>
+    </code>
+    <dependencies>
+      <node>
+        <package name="zustand" version="^5.0.8">State management with persist middleware</package>
+        <package name="next" version="^15.0.0">App Router, TypeScript support</package>
+        <package name="react" version="^18.3.0">Client components</package>
+        <package name="typescript" version="^5">Type safety</package>
+      </node>
+    </dependencies>
+  </artifacts>
+
+  <constraints>
+    - All gamification state MUST go in store/gamification.ts (single source of truth)
+    - localStorage key MUST be 'zeroai-gamification' (consistency with Story 4.1)
+    - MUST use Zustand persist middleware (no manual localStorage calls)
+    - Weekly reset logic MUST use week number calculation (not simple date comparison)
+    - Solo solve detection MUST check useChatStore.getState().metadata.confusedClicked
+    - Problem counting MUST only occur when X-Problem-Solved header is 'true'
+    - Milestone pattern MUST match Story 4.1 (MilestoneInfo interface)
+    - Error handling MUST use try-catch with graceful fallback to safe defaults
+    - Component MUST use 'use client' directive (client-side state)
+    - Display MUST hide when counters are 0 (first-time users)
+  </constraints>
+  <interfaces>
+    <interface>
+      <name>GamificationStore.incrementProblemCount</name>
+      <kind>zustand-action</kind>
+      <signature>incrementProblemCount: (isSoloSolve?: boolean) => MilestoneInfo</signature>
+      <path>store/gamification.ts</path>
+      <notes>Enhanced in Story 4.2 to accept optional isSoloSolve parameter and return MilestoneInfo</notes>
+    </interface>
+    <interface>
+      <name>getWeekNumber</name>
+      <kind>utility-function</kind>
+      <signature>getWeekNumber(date: Date): string</signature>
+      <path>lib/date-utils.ts</path>
+      <notes>New function for Story 4.2. Returns "YYYY-Wnn" format for week comparison</notes>
+    </interface>
+    <interface>
+      <name>ConversationMetadata.confusedClicked</name>
+      <kind>state-flag</kind>
+      <signature>confusedClicked: boolean</signature>
+      <path>store/chat.ts</path>
+      <notes>Read-only access for solo solve detection. True if confused button clicked during conversation</notes>
+    </interface>
+    <interface>
+      <name>X-Problem-Solved header</name>
+      <kind>http-header</kind>
+      <signature>X-Problem-Solved: "true" | "false"</signature>
+      <path>app/api/chat/route.ts</path>
+      <notes>Set by API when answerValidation.isCorrect === true. Already functional from Story 4.1</notes>
+    </interface>
+  </interfaces>
+  <tests>
+    <standards>Manual testing per ADR-004 (no automated tests for MVP). Use browser DevTools for localStorage inspection and date/time simulation. Focus on weekly reset boundary conditions and solo solve detection accuracy.</standards>
+    <locations>Browser-based manual testing. Inspect Application → Local Storage → zeroai-gamification. Use Console for milestone logs.</locations>
+    <ideas>
+      <test ac="1,5">First problem solve: totalProblems=1, weeklyProblems=1. Verify localStorage persistence.</test>
+      <test ac="3">Weekly reset: Set lastResetDate to previous week, solve problem, verify weeklyProblems=1 (reset)</test>
+      <test ac="4">Total counter persistence: Trigger weekly reset, verify totalProblems unchanged</test>
+      <test ac="6">Solo solve: Solve problem without clicking confused → soloSolves++. Solve after confused → no increment</test>
+      <test ac="8">Milestones: Manually set totalProblems to 9, solve problem, verify "10 problems" message in console</test>
+      <test>Edge case: Corrupt localStorage → should gracefully reset to defaults</test>
+      <test>Edge case: Very high counts (1000+) → verify no display/performance issues</test>
+    </ideas>
+  </tests>
+</story-context>

@@ -112,5 +112,5 @@ export function MathText({ text }: MathTextProps) {
 
   const renderedContent = renderMath(text);
 
-  return <div className="math-text">{renderedContent}</div>;
+  return <span className="math-text inline">{renderedContent}</span>;
 }

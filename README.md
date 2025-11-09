@@ -1,108 +1,104 @@
-# zeroai - AI Math Tutor
+# ZeroAI - Adaptive Socratic Math Tutor
 
-**Context-Aware Socratic Learning Assistant for K-12 Students**
-
-[![Deployment](https://img.shields.io/badge/status-ready%20for%20deployment-green)](https://vercel.com)
-[![Next.js](https://img.shields.io/badge/Next.js-15-black)](https://nextjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)](https://www.typescriptlang.org/)
-
-> "The AI tutor that adapts to YOUR learning situation - homework deadline, exam prep, or weekend exploration."
-
----
-
-## What Makes This Special
-
-zeroai is the **only AI math tutor** that combines three game-changing features:
-
-1. **Context-Aware Modes** - Adapts pacing to your situation (homework due soon vs. exploring for fun)
-2. **Scaffolded Socratic Method** - Guides you to understanding without giving direct answers, but provides worked examples when you're stuck (research-backed by Math Academy principles)
-3. **Student Agency** - YOU control the depth with the "I'm really confused" button
-
-### The Magic in Action
-
-**Homework Help Mode** (9pm, 10 problems due tomorrow)
-- Fast-paced guidance with efficient scaffolding
-- 2-3 questions per concept
-- "Let's work through this efficiently"
-
-**Exam Prep Mode** (test in 2 days)
-- Quick review assuming baseline knowledge
-- 1-2 questions per concept
-- "You've studied this - let's verify"
-
-**Exploration Mode** (weekend, curious about calculus)
-- Patient deep questioning
-- 5-7 questions per concept
-- "Let's explore why this works"
+An AI-powered math tutor that guides K-12 students through problems using **Socratic questioning** and **adaptive scaffolding**. Built with Next.js 15, OpenAI GPT-4, and modern UX patterns inspired by Khan Academy's Khanmigo.
 
 ---
 
 ## Features
 
-✅ **Socratic Dialogue** - Never gives direct answers, guides through questions
-✅ **Context Modes** - Homework Help, Exam Prep, Exploration (unique to zeroai)
-✅ **Worked Example Scaffolding** - Shows similar problem when stuck (research-backed)
-✅ **Student Agency** - "I'm confused" button for instant scaffolding
-✅ **Math Rendering** - Beautiful LaTeX/KaTeX rendering for equations
-✅ **Image Upload + OCR** - Upload photo of problem, AI extracts it (GPT-4 Vision)
-✅ **Gamification** - Daily streaks and problems solved counter (coming soon)
-✅ **Mobile Responsive** - Works on phone, tablet, desktop
+### Core Learning System
+- **Socratic Dialogue**: Never gives direct answers - guides students through questions and hints
+- **Adaptive Mastery Engine**: Detects struggle patterns and adjusts scaffolding automatically
+- **Intelligent Struggle Detection**: LLM analyzes student responses to determine when help is needed
+- **Worked Example Scaffolding**: Provides similar problem demonstrations when students get stuck
+
+### Context-Aware Learning Modes
+- **Homework Help**: Efficient pacing (2-3 questions per concept)
+- **Exam Prep**: Quick review mode (1-2 questions per concept)
+- **Exploration**: Deep patient guidance (5-7 questions per concept)
+
+### Problem Input & Rendering
+- **Text Input**: Natural language problem entry ("solve 2x + 5 = 13")
+- **Image Upload**: OCR/Vision LLM parsing for handwritten or screenshot problems
+- **Beautiful Math Rendering**: KaTeX integration for equations and expressions
+
+### Gamification & Engagement
+- **Daily Streak Tracker**: Encourages consistent practice habits
+- **Problems Solved Counter**: Tracks progress with milestone celebrations
+- **Celebration Animations**: Confetti effects and toast messages for achievements
+- **"I'm Really Confused" Button**: Student-initiated help request (appears when contextually relevant)
+
+### Technical Features
+- **Math Validation**: Pre-validates LLM responses using math.js and Wolfram Alpha fallback
+- **Student Answer Verification**: Automatically validates student responses for correctness
+- **Streaming Responses**: Real-time chat experience with character-by-character streaming
+- **Conversation State Management**: Zustand-powered state with metadata tracking
 
 ---
 
 ## Tech Stack
 
-- **Framework**: [Next.js 15](https://nextjs.org/) with App Router
-- **Language**: [TypeScript](https://www.typescriptlang.org/) for type safety
-- **Styling**: [Tailwind CSS](https://tailwindcss.com/) for rapid UI development
-- **LLM**: [OpenAI GPT-4](https://platform.openai.com/docs/models/gpt-4) for Socratic dialogue
-- **Vision/OCR**: [GPT-4 Vision](https://platform.openai.com/docs/guides/vision) for image problem extraction
-- **Math Rendering**: [KaTeX](https://katex.org/) (fast, lightweight, client-side)
-- **State Management**: [Zustand](https://zustand-demo.pmnd.rs/) with localStorage persistence
-- **Deployment**: [Vercel](https://vercel.com/) (one-command deploy, edge functions)
+### Frontend
+- **Framework**: [Next.js 15](https://nextjs.org/) (React 18, App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **State Management**: [Zustand](https://zustand-demo.pmnd.rs/)
+- **Math Rendering**: [KaTeX](https://katex.org/)
+- **Icons**: [Lucide React](https://lucide.dev/)
+- **Animations**: Canvas Confetti
+
+### Backend
+- **API**: Next.js API Routes (serverless)
+- **LLM**: OpenAI GPT-4 (with streaming)
+- **Math Validation**: math.js, Wolfram Alpha API
+- **Image Processing**: OpenAI Vision API (GPT-4 Vision)
+
+### Development
+- **Package Manager**: npm
+- **Linting**: ESLint (Next.js config)
+- **Type Checking**: TypeScript 5
 
 ---
 
-## Getting Started
+## Setup
 
 ### Prerequisites
-
-- **Node.js** 18+ (check with `node --version`)
-- **npm** or **yarn**
-- **OpenAI API Key** ([get one here](https://platform.openai.com/api-keys))
+- Node.js 18+ and npm
+- OpenAI API key ([Get one here](https://platform.openai.com/api-keys))
+- (Optional) Wolfram Alpha App ID for enhanced math validation
 
 ### Installation
 
-1. **Clone the repository**
+1. **Clone the repository:**
    ```bash
-   git clone https://github.com/yourusername/zeroai.git
+   git clone https://github.com/reena96/zeroai.git
    cd zeroai
    ```
 
-2. **Install dependencies**
+2. **Install dependencies:**
    ```bash
    npm install
    ```
 
-3. **Set up environment variables**
+3. **Set up environment variables:**
 
    Create a `.env.local` file in the root directory:
    ```env
    OPENAI_API_KEY=your_openai_api_key_here
+   WOLFRAM_APP_ID=your_wolfram_app_id_here  # Optional
    ```
 
-   **Important:** Never commit your API key to version control. The `.env.local` file is already in `.gitignore`.
-
-4. **Run the development server**
+4. **Run the development server:**
    ```bash
    npm run dev
    ```
 
-5. **Open your browser**
+5. **Open in browser:**
+   ```
+   http://localhost:3000
+   ```
 
-   Navigate to [http://localhost:3000](http://localhost:3000)
-
-### Building for Production
+### Build for Production
 
 ```bash
 npm run build
@@ -111,311 +107,169 @@ npm start
 
 ---
 
-## Example Problem Walkthroughs
-
-### Example 1: Linear Equation (Homework Mode)
-
-**Problem:** Solve for x: `2x + 5 = 13`
-
-**Dialogue Flow:**
-1. **AI:** "Let's work through this efficiently. What operation could undo the '+5'?"
-2. **Student:** "Subtract 5?"
-3. **AI:** "Exactly! Subtract 5 from both sides → 2x = 8. Now divide by 2 → x = 4. Check: 2(4) + 5 = 13 ✓"
-
-**Key Features Demonstrated:**
-- Efficient pacing (2-3 questions)
-- Socratic guidance (asks, doesn't tell)
-- Verification step
-
----
-
-### Example 2: Quadratic Equation (Exploration Mode)
-
-**Problem:** Solve: `x² - 9 = 0`
-
-**Dialogue Flow:**
-1. **AI:** "Great problem! Let's explore this together. What does this equation tell us?"
-2. **Student:** "x squared minus 9 equals zero?"
-3. **AI:** "Perfect! Now, what patterns do you notice in this equation? Hint: difference of squares."
-4. **Student:** "I don't know"
-5. **AI:** "Let's think about factoring. Can you recognize this as (a² - b²)?"
-6. **Student:** *[clicks "I'm really confused"]*
-7. **AI:** "No problem! Let me show you a similar problem:
-
-   **Similar Problem:** Solve: y² - 16 = 0
-
-   **Solution:**
-   1. Recognize as difference of squares: y² - 4² = 0
-   2. Factor: (y + 4)(y - 4) = 0
-   3. Solutions: y = 4 or y = -4
-   4. Check: (4)² - 16 = 0 ✓ and (-4)² - 16 = 0 ✓
-
-   Now apply this to x² - 9 = 0. Can you factor it?"
-
-**Key Features Demonstrated:**
-- Patient pacing (5-7 questions)
-- Student-controlled scaffolding (confused button)
-- Worked example with similar problem (NOT the exact problem)
-
----
-
-### Example 3: Word Problem (Exam Prep Mode)
-
-**Problem:** "A rectangle has length 8 and perimeter 26. Find the width."
-
-**Dialogue Flow:**
-1. **AI:** "Quick review - you know this. What's the formula for perimeter?"
-2. **Student:** "2L + 2W"
-3. **AI:** "Exactly. P = 2L + 2W. Plug in P = 26 and L = 8. What equation do you get?"
-4. **Student:** "26 = 16 + 2W"
-5. **AI:** "Perfect! Solve for W → 2W = 10 → W = 5. Check: 2(8) + 2(5) = 26 ✓"
-
-**Key Features Demonstrated:**
-- Fast pacing (1-2 questions)
-- Assumes baseline knowledge
-- Confident tone
-
----
-
-### Example 4: Image Upload with OCR
-
-**Problem:** Student uploads photo of handwritten problem: "3x - 7 = 14"
-
-**System Flow:**
-1. Student clicks "Upload Image" button
-2. Selects photo from camera roll or takes new photo
-3. GPT-4 Vision extracts problem text: "3x - 7 = 14"
-4. AI confirms: "I see you want to solve 3x - 7 = 14. Let's work through this together!"
-5. Socratic dialogue begins (same as text input)
-
-**Key Features Demonstrated:**
-- OCR extraction with GPT-4 Vision
-- Seamless transition to Socratic dialogue
-- Supports handwritten and printed problems
-
----
-
-### Example 5: Multi-Step Problem (Homework Mode with Scaffolding)
-
-**Problem:** Simplify: `5x + 3(2x - 4) + 7`
-
-**Dialogue Flow:**
-1. **AI:** "Let's work through this efficiently. What's the first step to simplify this expression?"
-2. **Student:** "Add 5x and 2x?"
-3. **AI:** "Not quite. We need to distribute first. What does 3(2x - 4) become when distributed?"
-4. **Student:** "6x - 12?"
-5. **AI:** "Exactly! So now we have 5x + 6x - 12 + 7. Combine like terms. What do you get?"
-6. **Student:** "11x - 5"
-7. **AI:** "Perfect! Final answer: 11x - 5 ✓"
-
-**Key Features Demonstrated:**
-- Order of operations guidance
-- Gentle error correction ("Not quite")
-- Step-by-step Socratic progression
-
----
-
-## How It Works
-
-### Architecture Overview
+## Project Structure
 
 ```
-User Input (Text or Image)
-        ↓
-Mode Selection (Homework/Exam/Exploration)
-        ↓
-API Route: /api/chat or /api/ocr
-        ↓
-OpenAI GPT-4 (Socratic System Prompts)
-        ↓
-Streaming Response with Math Rendering
-        ↓
-Chat UI with "I'm Confused" Button
+zeroai/
+├── app/                      # Next.js 15 App Router
+│   ├── api/chat/            # Chat API endpoint (streaming)
+│   ├── layout.tsx           # Root layout
+│   └── page.tsx             # Home page
+├── components/              # React components
+│   ├── ChatContainer.tsx    # Main chat interface
+│   ├── Message.tsx          # Individual message display
+│   ├── MessageInput.tsx     # User input with image upload
+│   ├── ModeSelector.tsx     # Learning mode selection
+│   ├── ModeIndicator.tsx    # Active mode badge
+│   ├── ConfusedButton.tsx   # Help request button
+│   ├── MathText.tsx         # KaTeX math renderer
+│   ├── ImageUpload.tsx      # OCR image upload
+│   ├── StreakTracker.tsx    # Daily streak display
+│   ├── ProblemCounter.tsx   # Problems solved counter
+│   └── CelebrationToast.tsx # Achievement notifications
+├── store/                   # Zustand state stores
+│   ├── chat.ts             # Chat state + metadata
+│   └── gamification.ts     # Streak/counter state
+├── lib/                     # Utility libraries
+│   ├── prompts.ts          # Socratic system prompts
+│   ├── math-validator.ts   # Math validation logic
+│   └── celebration.ts      # Confetti/toast helpers
+├── docs/                    # Documentation
+│   ├── architecture.md     # System design
+│   ├── prd.md             # Product requirements
+│   ├── sprint-status.yaml  # Development tracking
+│   └── validation/        # Testing guides
+└── public/                 # Static assets
 ```
-
-### Key Components
-
-- **`app/page.tsx`** - Main chat interface with mode selector
-- **`app/api/chat/route.ts`** - Socratic dialogue endpoint (streams GPT-4 responses)
-- **`app/api/ocr/route.ts`** - Image upload and OCR extraction (GPT-4 Vision)
-- **`components/ModeSelector.tsx`** - Context mode selection UI
-- **`components/ConfusedButton.tsx`** - Student agency feature (triggers worked examples)
-- **`components/MathText.tsx`** - KaTeX math rendering component
-- **`lib/prompts.ts`** - Socratic system prompts (3 mode-specific variants)
-
-### Prompt Engineering
-
-The magic is in the **Socratic system prompts** that guide GPT-4 to:
-
-1. **Never give direct answers** (unless explicitly requested)
-2. **Ask guiding questions** to lead student to understanding
-3. **Adapt pacing** based on mode (Homework/Exam/Exploration)
-4. **Provide worked examples** when student struggles (2-3 failed attempts)
-5. **Use LaTeX formatting** for beautiful math rendering
-6. **Verify answers** before affirming correctness
-
-See [`docs/prompts.md`](docs/prompts.md) for full prompt engineering documentation.
 
 ---
 
-## Deployment
+## Usage Examples
 
-### Deploy to Vercel (Recommended)
+### Basic Problem Solving
 
-1. **Push your code to GitHub**
-   ```bash
-   git add .
-   git commit -m "Initial commit"
-   git push origin main
-   ```
+1. **Select learning mode** (Homework Help, Exam Prep, or Exploration)
+2. **Type or upload a problem**:
+   - Text: "Solve for x: 2x + 5 = 13"
+   - Image: Upload screenshot of handwritten problem
+3. **Engage in Socratic dialogue** - answer AI's guiding questions
+4. **Request help if stuck** - click "I'm really confused" button for worked examples
+5. **Celebrate achievements** - watch your streak and problem counter grow!
 
-2. **Connect to Vercel**
-   - Go to [vercel.com](https://vercel.com)
-   - Click "New Project"
-   - Import your GitHub repository
-   - Vercel auto-detects Next.js
+### Example Conversation Flow
 
-3. **Configure Environment Variables**
-   - In Vercel dashboard, go to "Settings" → "Environment Variables"
-   - Add: `OPENAI_API_KEY` = `your_key_here`
+```
+Student: "Solve for x: 2x + 5 = 13"
 
-4. **Deploy**
-   - Click "Deploy"
-   - Your app will be live at `https://your-project.vercel.app`
+AI: "I see you want to solve 2x + 5 = 13. Let's work through this together!
+     What operation could you do to undo the '+5'?"
 
-### Alternative: Deploy to Netlify
+Student: "subtract 5?"
 
-1. **Build the project**
-   ```bash
-   npm run build
-   ```
+AI: "Exactly! If we subtract 5 from both sides, what do we get?"
 
-2. **Install Netlify CLI**
-   ```bash
-   npm install -g netlify-cli
-   ```
+Student: "2x = 8"
 
-3. **Deploy**
-   ```bash
-   netlify deploy --prod
-   ```
+AI: "Perfect! Now we have 2x = 8. What should we do next to find x?"
 
-4. **Set environment variables** in Netlify dashboard
+Student: "divide by 2"
+
+AI: "That's right! So x = 4.
+     Quick check: 2(4) + 5 = 8 + 5 = 13 ✓
+     Great work! 🎉"
+```
+
+---
+
+## Key Features Deep Dive
+
+### Intelligent Struggle Detection
+
+The system uses LLM-generated metadata markers to detect when students are struggling:
+
+- **[STRUGGLE:true]**: Student makes 2+ wrong attempts, shows confusion
+- **[STRUGGLE:false]**: Student demonstrates understanding, correct reasoning
+
+This enables the "I'm really confused" button to appear only when contextually relevant.
+
+### Adaptive Mastery Principles
+
+Based on [Math Academy](https://mathacademy.com/) methodology:
+
+1. **Mastery Gate**: Don't advance until current skill is demonstrated
+2. **Prerequisite Backtrack**: If same error repeats 2x, remediate foundation
+3. **Hint Ladder**: Escalating support (Conceptual Cue → Procedural Nudge → Worked Step)
+4. **Verification**: Always check final answers with micro-validation
+
+### Mode-Aware Prompting
+
+Different pacing for different contexts:
+
+| Mode | Questions/Concept | Scaffolding Trigger | Tone |
+|------|-------------------|---------------------|------|
+| Homework Help | 2-3 | After 2 errors | Efficient but thorough |
+| Exam Prep | 1-2 | After 2 errors | Quick review |
+| Exploration | 5-7 | After 3 errors | Patient, deep |
+
+---
+
+## Development Roadmap
+
+### Completed (Epics 1-4)
+- ✅ Core chat infrastructure
+- ✅ Scaffolded Socratic dialogue
+- ✅ Problem input & math rendering
+- ✅ Gamification & polish
+
+### Planned (Epic 5+)
+- 🚧 AI-generated visual explanations (diagrams, animations)
+- 🚧 Interactive whiteboard with step-by-step visualization
+- 🚧 Voice interface (text-to-speech + speech-to-text)
+- 🚧 Problem generation (create similar practice problems)
 
 ---
 
 ## Testing
 
-### Manual Validation (Per ADR-004)
+### Manual Testing
+See `docs/validation/epic2_validation.md` for comprehensive test scenarios.
 
-This project uses **manual testing** only (no automated tests) due to the 5-day Gauntlet competition timeline.
-
-**Test Coverage:** 20/20 scenarios passed (100% pass rate)
-- 5 problem types (Linear, Quadratic, Geometry, Word, Multi-step)
-- 3 modes (Homework, Exam, Exploration)
-- 5 edge cases
-
-**See:** [`docs/test-results.md`](docs/test-results.md) for full validation report
-
-**Key Metrics:**
-- ✅ Pedagogical Quality: 0% direct answer rate (perfect Socratic)
-- ✅ Technical Quality: LLM response < 2s average
-- ✅ Math Rendering: 100% accuracy (KaTeX)
-- ✅ Gauntlet Readiness: 95%
-
----
-
-## Project Structure
-
-```
-zeroai/
-├── app/
-│   ├── page.tsx                    # Main chat interface
-│   ├── layout.tsx                  # Root layout with providers
-│   ├── globals.css                 # Tailwind imports
-│   └── api/
-│       ├── chat/
-│       │   └── route.ts            # Socratic dialogue endpoint
-│       └── ocr/
-│           └── route.ts            # OCR image parsing
-│
-├── components/
-│   ├── ChatContainer.tsx           # Chat wrapper
-│   ├── MessageList.tsx             # Message display
-│   ├── MessageInput.tsx            # Input field
-│   ├── Message.tsx                 # Single message component
-│   ├── ModeSelector.tsx            # Mode selection UI
-│   ├── ConfusedButton.tsx          # "I'm confused" trigger
-│   ├── MathText.tsx                # KaTeX math rendering
-│   └── ImageUpload.tsx             # Image upload component
-│
-├── lib/
-│   ├── prompts.ts                  # Socratic system prompts
-│   └── math-validator.ts           # Answer validation logic
-│
-├── store/
-│   └── chat.ts                     # Zustand state management
-│
-├── docs/
-│   ├── PRD.md                      # Product requirements
-│   ├── architecture.md             # Technical architecture
-│   ├── test-results.md             # Validation results
-│   └── prompts.md                  # Prompt engineering docs
-│
-├── package.json                    # Dependencies
-├── tsconfig.json                   # TypeScript config
-├── tailwind.config.ts              # Tailwind config
-└── next.config.js                  # Next.js config
-```
-
----
-
-## Known Limitations
-
-- **OCR Testing:** End-to-end OCR validation not completed (image input not available in test environment)
-- **Browser Coverage:** Tested on Chrome only (Safari/Firefox not validated)
-- **Mobile Testing:** Responsive design implemented but not manually tested on physical devices
-- **Gamification:** Streaks and celebration animations not yet implemented (Epic 4)
-
-**Overall Gauntlet Readiness:** 95%
+### Test Coverage Areas
+- Simple arithmetic, algebra, geometry
+- Word problems, multi-step problems
+- Mode switching and adaptive pacing
+- Image upload and OCR accuracy
+- Streak/counter persistence
 
 ---
 
 ## Contributing
 
-This is a Gauntlet C3 competition project. Contributions welcome after competition ends!
+This is a project submission for the Gauntlet C3 AI Builders Program. For questions or collaboration:
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+**Contact**: reena96 (GitHub)
+
+---
+
+## Evaluation Criteria Alignment
+
+This project addresses the following evaluation criteria:
+
+- **Pedagogical Quality (35%)**: Genuine Socratic guidance with adaptive scaffolding
+- **Technical Implementation (30%)**: Production-ready Next.js app with streaming, validation, and state management
+- **User Experience (20%)**: Intuitive modes, beautiful math rendering, gamification
+- **Innovation (15%)**: Intelligent struggle detection, LLM-driven adaptive learning, context-aware prompting
 
 ---
 
 ## License
 
-MIT License - see LICENSE file for details
+MIT License - See LICENSE file for details
 
 ---
 
 ## Acknowledgments
 
-- **Pedagogical Research:** Math Academy (adaptive mastery principles), Khan Academy (Socratic method)
-- **LLM Provider:** OpenAI GPT-4 and GPT-4 Vision
-- **Framework:** Next.js team for incredible DX
-- **Math Rendering:** KaTeX team for fast, beautiful LaTeX rendering
-
----
-
-## Contact
-
-**Author:** Reena
-**Project:** Gauntlet C3 AI Math Tutor
-**Date:** November 2025
-
-**Deployed URL:** https://zeroai-tutor.vercel.app *(coming soon)*
-
----
-
-**Built with ❤️ for K-12 students who deserve adaptive, empowering math help.**
+- Inspired by [OpenAI x Khan Academy Khanmigo](https://www.youtube.com/watch?v=IvXZCocyU_M)
+- Socratic methodology from [Math Academy](https://mathacademy.com/)
+- Built with [Claude Code](https://claude.com/claude-code)

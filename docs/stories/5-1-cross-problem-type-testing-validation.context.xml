@@ -1,0 +1,256 @@
+<story-context id="bmad/bmm/workflows/4-implementation/story-context/template" v="1.0">
+  <metadata>
+    <epicId>5</epicId>
+    <storyId>5.1</storyId>
+    <title>Cross-Problem-Type Testing & Validation</title>
+    <status>drafted</status>
+    <generatedAt>2025-11-08</generatedAt>
+    <generator>BMAD Story Context Workflow</generator>
+    <sourceStoryPath>docs/stories/5-1-cross-problem-type-testing-validation.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>Gauntlet evaluator</asA>
+    <iWant>to see the tutor successfully guide students through diverse problem types</iWant>
+    <soThat>I can validate pedagogical quality across domains</soThat>
+    <tasks>
+- [ ] Task 1: Create test matrix and validation framework (AC: #1, #3)
+- [ ] Task 2: Test linear equations across all 3 modes (AC: #1, #2, #4)
+- [ ] Task 3: Test quadratic equations (AC: #1, #2, #4)
+- [ ] Task 4: Test geometry problems (AC: #1, #2, #4)
+- [ ] Task 5: Test word problems (AC: #1, #2, #4)
+- [ ] Task 6: Test multi-step problems (AC: #1, #2, #4)
+- [ ] Task 7: Test edge cases and error handling (AC: #5)
+- [ ] Task 8: Validate performance benchmarks (AC: #6)
+- [ ] Task 9: Bug fixes and regression testing (AC: #7)
+- [ ] Task 10: Final validation and documentation (AC: #3, #4)
+    </tasks>
+  </story>
+
+  <acceptanceCriteria>
+1. Test suite covers 5+ problem types: Linear equations, Quadratic equations, Geometry, Word problems, Multi-step
+2. For each problem type: AI guides without giving direct answer ✅, Worked examples provided when stuck ✅, Different pacing across modes observable ✅, Math rendering works correctly ✅
+3. Document test results in `/docs/test-results.md`
+4. All 5 problem types pass successfully
+5. Edge cases tested: Ambiguous problems, incorrect student answers, confused button spam
+6. Performance validated: <3s LLM response, <5s OCR
+7. Bug fixes completed for any failures
+  </acceptanceCriteria>
+
+  <artifacts>
+    <docs>
+      <doc>
+        <path>docs/PRD.md</path>
+        <title>Product Requirements Document</title>
+        <section>Success Criteria - Pedagogical Quality</section>
+        <snippet>Pedagogical Quality (35% weight): Demonstrates scaffolded Socratic method across 5+ problem types, NEVER gives direct answers, provides worked examples as "concrete hints", context-aware pacing adapts to selected mode</snippet>
+      </doc>
+      <doc>
+        <path>docs/PRD.md</path>
+        <title>Product Requirements Document</title>
+        <section>Success Criteria - Technical Implementation</section>
+        <snippet>Technical Implementation (30% weight): Production-ready quality - bug-free, fast response times (<3 sec), handles edge cases. OCR/Vision LLM successfully extracts problems from images. Math rendering (LaTeX/KaTeX) displays equations properly.</snippet>
+      </doc>
+      <doc>
+        <path>docs/architecture.md</path>
+        <title>Architecture Document</title>
+        <section>ADR-004: Manual Testing Only</section>
+        <snippet>Decision: Manual testing with documented test matrix. No Jest/Cypress/Playwright. Rationale: 5-day timeline is aggressive, test matrix (30 cases) provides good coverage, Gauntlet judges test manually anyway.</snippet>
+      </doc>
+      <doc>
+        <path>docs/architecture.md</path>
+        <title>Architecture Document</title>
+        <section>Performance Considerations</section>
+        <snippet>LLM Response Time - Targets: First token <3s, Total response <30s, 95th percentile <5s first token. Image Processing - Targets: Upload + OCR <5s, Max file size 10MB, Focus on printed text (90%+ accuracy).</snippet>
+      </doc>
+      <doc>
+        <path>docs/epics/epic-5-testing-documentation-deployment.md</path>
+        <title>Epic 5: Testing, Documentation & Deployment</title>
+        <section>Story 5.1: Cross-Problem-Type Testing & Validation</section>
+        <snippet>Goal: Validate across 5+ problem types, create documentation. Why This Last: Product is feature-complete. Now prove it works end-to-end and prepare for Gauntlet submission. Value: Launch-ready product that meets all Gauntlet criteria.</snippet>
+      </doc>
+      <doc>
+        <path>docs/stories/3-3-katex-math-rendering.md</path>
+        <title>Story 3.3: KaTeX Math Rendering</title>
+        <section>Completion Notes List</section>
+        <snippet>MathText component created at components/MathText.tsx. Parses inline math ($...$) and display math ($$...$$). Uses katex.renderToString() client-side. Handles mixed text and math. All katex calls wrapped in try-catch with graceful fallback to plain text.</snippet>
+      </doc>
+    </docs>
+
+    <code>
+      <artifact>
+        <path>app/api/chat/route.ts</path>
+        <kind>api-route</kind>
+        <symbol>POST</symbol>
+        <lines>all</lines>
+        <reason>Primary LLM endpoint for Socratic dialogue - needs performance testing (<3s response time)</reason>
+      </artifact>
+      <artifact>
+        <path>app/api/ocr/route.ts</path>
+        <kind>api-route</kind>
+        <symbol>POST</symbol>
+        <lines>all</lines>
+        <reason>OCR endpoint for image problem extraction - needs performance testing (<5s processing time)</reason>
+      </artifact>
+      <artifact>
+        <path>components/ModeSelector.tsx</path>
+        <kind>component</kind>
+        <symbol>ModeSelector</symbol>
+        <lines>all</lines>
+        <reason>Mode selection UI (Homework/Exam/Exploration) - test pacing differences across modes</reason>
+      </artifact>
+      <artifact>
+        <path>components/ConfusedButton.tsx</path>
+        <kind>component</kind>
+        <symbol>ConfusedButton</symbol>
+        <lines>all</lines>
+        <reason>Triggers worked example scaffolding - test edge case of button spam</reason>
+      </artifact>
+      <artifact>
+        <path>components/MathText.tsx</path>
+        <kind>component</kind>
+        <symbol>MathText</symbol>
+        <lines>all</lines>
+        <reason>KaTeX math rendering component - test rendering across all problem types</reason>
+      </artifact>
+      <artifact>
+        <path>components/ChatContainer.tsx</path>
+        <kind>component</kind>
+        <symbol>ChatContainer</symbol>
+        <lines>all</lines>
+        <reason>Main chat interface - integration testing entry point</reason>
+      </artifact>
+      <artifact>
+        <path>lib/prompts.ts</path>
+        <kind>utility</kind>
+        <symbol>SOCRATIC_PROMPTS</symbol>
+        <lines>all</lines>
+        <reason>Mode-specific system prompts - validate no direct answer-giving across all modes</reason>
+      </artifact>
+      <artifact>
+        <path>lib/math-validator.ts</path>
+        <kind>utility</kind>
+        <symbol>validateMathAnswer</symbol>
+        <lines>all</lines>
+        <reason>Math answer validation logic - test with various problem types</reason>
+      </artifact>
+      <artifact>
+        <path>store/chat.ts</path>
+        <kind>state-management</kind>
+        <symbol>useChatStore</symbol>
+        <lines>all</lines>
+        <reason>Conversation state management - verify context maintenance across turns</reason>
+      </artifact>
+    </code>
+
+    <dependencies>
+      <node>
+        <package name="next" version="^15.0.0" />
+        <package name="react" version="^18.3.0" />
+        <package name="openai" version="^6.8.0" />
+        <package name="katex" version="^0.16.25" />
+        <package name="zustand" version="^5.0.8" />
+        <package name="mathjs" version="^15.0.0" />
+        <package name="nanoid" version="^5.1.6" />
+        <package name="@browserbasehq/sdk" version="^2.6.0" />
+        <package name="lucide-react" version="^0.553.0" />
+      </node>
+    </dependencies>
+  </artifacts>
+
+  <constraints>
+- Manual testing only per ADR-004 (no automated tests)
+- Test matrix must be comprehensive: 5 problem types × 3 modes = 15 core scenarios + edge cases
+- Document all findings in docs/test-results.md with structured format
+- Performance targets are hard requirements: <3s LLM, <5s OCR
+- Pedagogical validation is critical (35% of Gauntlet score): NEVER give direct answers
+- All bug fixes must not introduce regressions - re-test affected scenarios
+- Test across all browsers: Chrome (primary), Safari, Firefox (secondary)
+- Responsive testing required: Desktop 1024px+, Tablet 768px+
+- Focus on production-ready quality: bug-free, graceful error handling, edge cases covered
+  </constraints>
+
+  <interfaces>
+    <interface>
+      <name>POST /api/chat</name>
+      <kind>REST endpoint</kind>
+      <signature>Request: { messages: Message[], mode: Mode }; Response: ReadableStream (streaming) | ApiResponse (error)</signature>
+      <path>app/api/chat/route.ts</path>
+    </interface>
+    <interface>
+      <name>POST /api/ocr</name>
+      <kind>REST endpoint</kind>
+      <signature>Request: { image: string (base64) }; Response: { success: boolean, data: { problem: string } } | ApiResponse (error)</signature>
+      <path>app/api/ocr/route.ts</path>
+    </interface>
+    <interface>
+      <name>useChatStore</name>
+      <kind>Zustand store</kind>
+      <signature>{ messages: Message[], mode: Mode, isLoading: boolean, addMessage: (msg: Message) => void, setMode: (mode: Mode) => void, ... }</signature>
+      <path>store/chat.ts</path>
+    </interface>
+    <interface>
+      <name>SOCRATIC_PROMPTS</name>
+      <kind>Constant object</kind>
+      <signature>{ homework: string, exam: string, explore: string } - Mode-specific system prompts</signature>
+      <path>lib/prompts.ts</path>
+    </interface>
+  </interfaces>
+
+  <tests>
+    <standards>
+Manual testing with documented test matrix per ADR-004. No automated tests (Jest/Cypress/Playwright). Test results documented in structured format in docs/test-results.md. Focus on: pedagogical quality (no direct answers, Socratic guidance), technical quality (performance, error handling), user experience (all features work as expected).
+    </standards>
+
+    <locations>
+- docs/test-results.md (to be created)
+- Test cases executed in local dev environment (npm run dev)
+- Browser testing: Chrome (primary), Safari/Firefox (secondary)
+- Responsive testing: Desktop view (1024px+), Tablet view (768px+)
+    </locations>
+
+    <ideas>
+AC #1: Test Coverage for 5 Problem Types
+- Create test matrix with structured template in docs/test-results.md
+- Define 5+ problem examples: Linear, Quadratic, Geometry, Word, Multi-step
+- Document expected AI behaviors for each problem type
+
+AC #2: Validate AI Behavior for Each Problem Type
+- Test linear equation "2x + 5 = 13" in all 3 modes (Homework, Exam, Exploration)
+- Verify no direct answers given, only Socratic guidance
+- Test worked example scaffolding when "confused" button clicked
+- Verify math rendering for all LaTeX notation types
+- Document observable pacing differences across modes
+
+AC #3: Document Test Results
+- Create docs/test-results.md with comprehensive test matrix
+- Include: Problem Type, Mode, Direct Answer?, Worked Example?, Math Rendering?, Pass/Fail, Notes
+- Add screenshots/evidence of successful tests
+- Document performance benchmarks
+
+AC #4: All Problem Types Pass
+- Run all 15 core test scenarios (5 types × 3 modes)
+- Verify each passes all validation criteria
+- Fix any failures before marking story complete
+
+AC #5: Edge Case Testing
+- Test ambiguous problem handling (unclear input)
+- Test incorrect student answer responses (AI should correct without revealing)
+- Test "confused" button spam (multiple rapid clicks)
+- Test empty input handling
+- Test malformed LaTeX (graceful fallback to plain text)
+
+AC #6: Performance Validation
+- Measure LLM response time for each problem type
+- Verify all responses <3s (target)
+- Test OCR processing time with images (<5s target)
+- Document actual performance vs targets in test-results.md
+
+AC #7: Bug Fixes and Regression
+- Identify any failures during testing
+- Fix critical bugs blocking validation
+- Re-run affected test cases to verify fixes
+- Document all bug fixes in test-results.md
+    </ideas>
+  </tests>
+</story-context>

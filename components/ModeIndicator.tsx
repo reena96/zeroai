@@ -10,19 +10,19 @@ const modeConfig = {
   homework: {
     icon: Clock,
     label: 'Homework Help',
-    color: 'bg-blue-100 text-blue-700',
+    color: 'bg-blue-500 text-white border border-blue-400',
     tooltip: 'Efficient help mode - You can restart to change modes',
   },
   exam: {
     icon: BookOpen,
     label: 'Exam Prep',
-    color: 'bg-orange-100 text-orange-700',
+    color: 'bg-rose-500 text-white border border-rose-400',
     tooltip: 'Fast-paced review mode - You can restart to change modes',
   },
   explore: {
     icon: Sparkles,
     label: 'Exploration',
-    color: 'bg-green-100 text-green-700',
+    color: 'bg-emerald-500 text-white border border-emerald-400',
     tooltip: 'Deep exploration mode - You can restart to change modes',
   },
 };
@@ -34,7 +34,7 @@ export default function ModeIndicator({ mode }: ModeIndicatorProps) {
   return (
     <div
       className={`
-        inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium
+        inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold shadow-lg
         ${config.color}
       `}
       title={config.tooltip}
