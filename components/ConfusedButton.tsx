@@ -18,7 +18,7 @@ export default function ConfusedButton({ onClick }: ConfusedButtonProps) {
   return (
     <button
       onClick={onClick}
-      className="mt-3 px-4 py-2 text-sm font-medium text-cyan-700 bg-cyan-50 hover:bg-cyan-100 active:bg-cyan-200 border border-cyan-200 rounded-lg transition-all shadow-sm hover:shadow inline-flex items-center gap-2 min-h-[36px]"
+      className="mt-3 px-4 py-2.5 text-sm font-medium text-cyan-700 bg-cyan-50 hover:bg-cyan-100 active:bg-cyan-200 border border-cyan-200 rounded-lg transition-all shadow-sm hover:shadow inline-flex items-center gap-2 min-h-[44px] touch-manipulation"
       aria-label="I&apos;m really confused - get help"
     >
       <HelpCircle className="w-4 h-4" />

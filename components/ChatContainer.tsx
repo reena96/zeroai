@@ -45,21 +45,23 @@ export default function ChatContainer() {
   return (
     <div className="flex flex-col h-screen max-w-5xl mx-auto bg-gradient-to-br from-slate-50 to-slate-100">
       {/* Header with Mode Indicator and Stats */}
-      <div className="bg-gradient-to-r from-cyan-600 via-teal-600 to-cyan-600 text-white p-6 shadow-lg">
-        <div className="flex items-start justify-between mb-4">
-          <div>
-            <h1 className="text-3xl font-bold">
+      <div className="bg-gradient-to-r from-cyan-600 via-teal-600 to-cyan-600 text-white p-4 sm:p-6 shadow-lg">
+        <div className="flex flex-col sm:flex-row items-start sm:justify-between gap-3 mb-4">
+          <div className="flex-1">
+            <h1 className="text-2xl sm:text-3xl font-bold">
               ZeroAI Math Tutor
             </h1>
-            <p className="text-sm text-cyan-100 font-medium mt-1">
+            <p className="text-xs sm:text-sm text-cyan-100 font-medium mt-1">
               Your Socratic learning companion
             </p>
           </div>
-          <ModeIndicator mode={sessionMode} />
+          <div className="sm:ml-auto">
+            <ModeIndicator mode={sessionMode} />
+          </div>
         </div>
 
         {/* Stats Row */}
-        <div className="flex items-center gap-3 flex-wrap">
+        <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
           <StreakDisplay />
           <ProblemCounter />
         </div>

@@ -44,7 +44,7 @@ export default function Message({ message, isLatestAssistantMessage = false }: M
         {/* Content wrapper with relative positioning */}
         <div className="relative z-10">
           {/* Message content */}
-          <div className={`text-sm whitespace-pre-wrap break-words leading-relaxed ${isUser ? 'text-white' : 'text-slate-700'}`}>
+          <div className={`text-sm sm:text-base whitespace-pre-wrap break-words leading-relaxed ${isUser ? 'text-white' : 'text-slate-700'}`}>
             {isUser ? message.content : <MathText text={message.content} />}
           </div>
 

@@ -181,7 +181,7 @@ export default function MessageInput() {
       <ImageUpload onExtract={handleImageExtract} />
 
       {/* Text Input */}
-      <div className="flex gap-3">
+      <div className="flex gap-3 flex-col sm:flex-row">
         <input
           type="text"
           value={input}
@@ -189,12 +189,12 @@ export default function MessageInput() {
           onKeyPress={handleKeyPress}
           placeholder="Type your math problem here..."
           disabled={isLoading}
-          className="flex-1 px-5 py-3.5 bg-white border-2 border-slate-200 rounded-xl text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 focus:shadow-lg focus:shadow-cyan-500/10 disabled:bg-slate-100 disabled:cursor-not-allowed transition-all shadow-sm"
+          className="flex-1 px-5 py-3.5 min-h-[48px] bg-white border-2 border-slate-200 rounded-xl text-base text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 focus:shadow-lg focus:shadow-cyan-500/10 disabled:bg-slate-100 disabled:cursor-not-allowed transition-all shadow-sm touch-manipulation"
         />
         <button
           onClick={handleSend}
           disabled={!input.trim() || isLoading}
-          className="relative overflow-hidden px-8 py-3.5 bg-gradient-to-br from-cyan-500 via-cyan-600 to-teal-600 text-white rounded-xl font-bold hover:from-cyan-600 hover:to-teal-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 disabled:from-slate-300 disabled:to-slate-300 disabled:cursor-not-allowed transition-all shadow-lg shadow-cyan-500/30 hover:shadow-xl hover:shadow-cyan-500/40 border border-cyan-400/50"
+          className="relative overflow-hidden px-8 py-3.5 min-h-[48px] bg-gradient-to-br from-cyan-500 via-cyan-600 to-teal-600 text-white rounded-xl font-bold hover:from-cyan-600 hover:to-teal-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 disabled:from-slate-300 disabled:to-slate-300 disabled:cursor-not-allowed transition-all shadow-lg shadow-cyan-500/30 hover:shadow-xl hover:shadow-cyan-500/40 border border-cyan-400/50 touch-manipulation sm:min-w-[100px]"
         >
           {/* Button shine effect */}
           <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/20 to-white/0" />
