@@ -1,6 +1,8 @@
 # BMAD (local only)
 .bmad-core/
 .bmad-*/
+bmad/
+v4-backup/
 
 # dependencies
 /node_modules
