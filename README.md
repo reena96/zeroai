@@ -2,7 +2,7 @@
 
 An AI-powered math tutor that guides K-12 students through problems using **Socratic questioning** and **adaptive scaffolding**. Built with Next.js 15, OpenAI GPT-4, and modern UX patterns inspired by Khan Academy's Khanmigo.
 
-**🚀 Live Demo:** [https://zeroai-pi.vercel.app](https://zeroai-pi.vercel.app)
+**🚀 Live Demo:** [https://zeroai-mathtutor.vercel.app](https://zeroai-mathtutor.vercel.app)
 
 ---
 
