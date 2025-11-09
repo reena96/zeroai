@@ -335,7 +335,7 @@ export function validateStudentAnswer(
 
         const validation = validateWithMathJS(expression);
         if (validation.isValid && validation.result !== undefined) {
-          const expectedAnswer = parseFloat(validation.result);
+          const expectedAnswer = parseFloat(String(validation.result));
           const isCorrect = Math.abs(studentAnswer - expectedAnswer) < 0.001;
 
           console.log('[Answer Validation] Expression', expression, 'evaluates to', expectedAnswer, '- student answered', studentAnswer, '- match:', isCorrect);
@@ -345,7 +345,7 @@ export function validateStudentAnswer(
               hasAnswer: true,
               isCorrect: true,
               studentAnswer: trimmed,
-              expectedAnswer: validation.result,
+              expectedAnswer: String(validation.result),
               validationNote: `[VALIDATION: Student answered ${trimmed} - CORRECT]`,
             };
           }
@@ -367,14 +367,14 @@ export function validateStudentAnswer(
         const validation = validateWithMathJS(expression);
 
         if (validation.isValid && validation.result !== undefined) {
-          const expectedAnswer = parseFloat(validation.result);
+          const expectedAnswer = parseFloat(String(validation.result));
           const isCorrect = Math.abs(studentAnswer - expectedAnswer) < 0.001; // Handle floating point
 
           return {
             hasAnswer: true,
             isCorrect: isCorrect,
             studentAnswer: trimmed,
-            expectedAnswer: validation.result,
+            expectedAnswer: String(validation.result),
             validationNote: isCorrect
               ? `[VALIDATION: Student answered ${trimmed} - CORRECT]`
               : `[VALIDATION: Student answered ${trimmed} - INCORRECT. Expected ${validation.result}. Check calculation before affirming.]`,
