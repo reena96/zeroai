@@ -1,6 +1,7 @@
 'use client';
 
 import { useGamificationStore } from '@/store/gamification';
+import { Target, TrendingUp, Zap } from 'lucide-react';
 
 export function ProblemCounter() {
   const weeklyProblems = useGamificationStore((state) => state.weeklyProblems);
@@ -13,17 +14,26 @@ export function ProblemCounter() {
   const problemLabel = weeklyProblems === 1 ? 'problem' : 'problems';
 
   return (
-    <div className="flex flex-col items-end gap-1 text-sm">
-      {/* Main display: weekly count */}
-      <div className="flex items-center gap-2 text-blue-600 font-semibold">
-        <span className="text-xl" aria-label="Trophy emoji">💪</span>
-        <span>{weeklyProblems} {problemLabel} this week!</span>
+    <>
+      {/* Weekly problems */}
+      <div className="flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm text-white rounded-full border border-white/30">
+        <Target className="w-4 h-4" />
+        <span className="font-bold text-sm">{weeklyProblems} {problemLabel}</span>
       </div>
 
-      {/* Expanded view: total and solo solves */}
-      <div className="text-xs text-gray-500">
-        {totalProblems} total{soloSolves > 0 && ` • ${soloSolves} solo`}
+      {/* Total problems */}
+      <div className="flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm text-white rounded-full border border-white/30">
+        <TrendingUp className="w-4 h-4" />
+        <span className="font-bold text-sm">{totalProblems} total</span>
       </div>
-    </div>
+
+      {/* Solo solves */}
+      {soloSolves > 0 && (
+        <div className="flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm text-white rounded-full border border-white/30">
+          <Zap className="w-4 h-4" />
+          <span className="font-bold text-sm">{soloSolves} solo</span>
+        </div>
+      )}
+    </>
   );
 }

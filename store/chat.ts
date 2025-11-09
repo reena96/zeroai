@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import { nanoid } from 'nanoid';
 
 // Message interface matching architecture specification
@@ -36,19 +37,21 @@ interface ChatState {
   triggerConfusedClick: () => Promise<void>;
 }
 
-// Create Zustand store
-export const useChatStore = create<ChatState>((set, get) => ({
-  messages: [],
-  isLoading: false,
-  sessionMode: null, // Start with no mode selected
-  metadata: {
-    confusedClicked: false,
-    confusedClickTimestamp: null,
-    paceCheckShown: false,
-    consecutiveExchanges: 0,
-    isStruggling: false,
-    showConfusedButton: false,
-  },
+// Create Zustand store with localStorage persistence
+export const useChatStore = create<ChatState>()(
+  persist(
+    (set, get) => ({
+      messages: [],
+      isLoading: false,
+      sessionMode: null, // Start with no mode selected
+      metadata: {
+        confusedClicked: false,
+        confusedClickTimestamp: null,
+        paceCheckShown: false,
+        consecutiveExchanges: 0,
+        isStruggling: false,
+        showConfusedButton: false,
+      },
 
   addMessage: (role, content) => {
     const newMessage: Message = {
@@ -208,4 +211,15 @@ export const useChatStore = create<ChatState>((set, get) => ({
       );
     }
   },
-}));
+}),
+    {
+      name: 'zeroai-chat', // localStorage key
+      partialize: (state) => ({
+        messages: state.messages,
+        sessionMode: state.sessionMode,
+        metadata: state.metadata,
+        // Don't persist isLoading (transient state)
+      }),
+    }
+  )
+);

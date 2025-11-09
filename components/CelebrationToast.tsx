@@ -32,12 +32,12 @@ export function CelebrationToast({ message, onComplete }: CelebrationToastProps)
 
   return (
     <div
-      className={`fixed top-4 left-1/2 -translate-x-1/2 md:left-auto md:right-4 md:translate-x-0 z-50 transition-opacity duration-300 ${
-        isVisible ? 'opacity-100' : 'opacity-0'
+      className={`fixed top-6 left-1/2 -translate-x-1/2 md:left-auto md:right-6 md:translate-x-0 z-50 transition-all duration-500 ${
+        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'
       }`}
     >
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-lg shadow-lg">
-        <p className="text-lg font-semibold whitespace-nowrap">{message}</p>
+      <div className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-8 py-4 rounded-2xl shadow-2xl border border-white/20 backdrop-blur-sm">
+        <p className="text-lg font-bold whitespace-nowrap">{message}</p>
       </div>
     </div>
   );

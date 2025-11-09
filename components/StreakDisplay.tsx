@@ -1,23 +1,16 @@
 'use client';
 
 import { useGamificationStore } from '@/store/gamification';
-import { useEffect, useState } from 'react';
+import { Flame } from 'lucide-react';
 
 /**
  * StreakDisplay Component
- * Shows daily streak prominently in header: "🔥 5 day streak!"
+ * Shows daily streak prominently in header with modern design
  * Handles singular/plural: "1 day" vs "5 days"
  * Hidden when streak is 0 (first-time users before first problem)
  */
 export function StreakDisplay() {
   const currentStreak = useGamificationStore((state) => state.streakData.currentStreak);
-  const [milestoneMessage, setMilestoneMessage] = useState<string | null>(null);
-
-  // Check for milestone on mount (in case streak was updated elsewhere)
-  useEffect(() => {
-    // Milestone messages are handled by celebration component (Story 4.3)
-    // This effect is placeholder for future milestone toast integration
-  }, [currentStreak]);
 
   // Don't show streak before first problem solved
   if (currentStreak === 0) {
@@ -28,12 +21,10 @@ export function StreakDisplay() {
   const dayLabel = currentStreak === 1 ? 'day' : 'days';
 
   return (
-    <div className="flex items-center gap-2 text-orange-600 font-semibold">
-      <span className="text-2xl" aria-label="Fire emoji">
-        🔥
-      </span>
-      <span className="text-lg">
-        {currentStreak} {dayLabel} streak!
+    <div className="flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm text-white rounded-full border border-white/30">
+      <Flame className="w-4 h-4" />
+      <span className="font-bold text-sm">
+        {currentStreak} {dayLabel} streak
       </span>
     </div>
   );

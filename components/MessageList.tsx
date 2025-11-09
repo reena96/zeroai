@@ -23,22 +23,25 @@ export default function MessageList() {
   return (
     <div
       ref={scrollContainerRef}
-      className="h-full overflow-y-auto p-4 bg-gradient-to-b from-gray-50 to-white"
+      className="h-full overflow-y-auto p-6 bg-gradient-to-b from-slate-50 to-white"
     >
       {messages.length === 0 ? (
-        <div className="flex items-center justify-center h-full text-gray-500">
-          <div className="text-center">
-            <p className="text-lg font-semibold mb-2">Welcome to ZeroAI! 👋</p>
-            <p className="text-sm">
+        <div className="flex items-center justify-center h-full">
+          <div className="text-center max-w-md px-6">
+            <div className="mb-4 text-6xl">✨</div>
+            <h2 className="text-2xl font-bold bg-gradient-to-r from-cyan-600 to-teal-600 bg-clip-text text-transparent mb-3">
+              Welcome to ZeroAI!
+            </h2>
+            <p className="text-slate-600 mb-2">
               Start a conversation by typing a message below.
             </p>
-            <p className="text-xs mt-2 text-gray-400">
+            <p className="text-sm text-slate-400">
               I&apos;ll guide you through problems using Socratic questioning.
             </p>
           </div>
         </div>
       ) : (
-        <div className="space-y-2">
+        <div className="space-y-1">
           {messages.map((message, index) => (
             <Message
               key={message.id}
